@@ -14,6 +14,6 @@ export default class App {
   start():void {
     this.app.listen(this.port, this.host, () => {
       console.log(`Server is running on http://${this.host}:${this.port}`);
-    })
+    });
   }
 };
