@@ -10,4 +10,4 @@ module.exports = {
     port: DB.PORT,
     schema: 'public'
   }
-}
+};
