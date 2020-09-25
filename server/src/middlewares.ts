@@ -2,7 +2,7 @@ import App from './app';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
-import { jwt } from './auth_strategies';
+import { jwt, local } from './auth_strategies';
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -13,6 +13,7 @@ passport.deserializeUser((user, done) => {
 });
 
 passport.use(jwt);
+passport.use(local);
 
 export default (app: App):void => {
   app.middlewares([

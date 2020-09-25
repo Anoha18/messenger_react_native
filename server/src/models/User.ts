@@ -5,42 +5,30 @@ export interface UserInterface {
   name?: string,
   lastname?: string,
   deleted?: boolean,
-  created_at?: string,
-  updated_at?: string
+  created_date?: string,
+  created_time?: string,
+  updated_date?: string,
+  updated_time?: string
 }
 
-const userDbKeys = [
-  'u.id',
-  'u.name',
-  'u.lastname',
-  'u.deleted',
-  'u.created_at',
-  'u.updated_at'
-];
+export class User {
+  static userDbKeys = [
+    'u.id',
+    'u.name',
+    'u.lastname',
+    'u.deleted',
+    `to_char(u.created_at, 'DD:MM:YYYY') created_date`,
+    `to_char(u.created_at, 'HH21:MI') created_time`,
+    `to_char(u.updated_at, 'HH21:MI') updated_time`,
+    `to_char(u.updated_at, 'DD:MM:YYYY') updated_date`,
+  ];
 
-export class User implements UserInterface {
-  id: number;
-  name?: string;
-  lastname?: string;
-  deleted?: boolean;
-  created_at?: string;
-  updated_at?: string;
-
-  constructor(id:number, name?:string, lastname?:string, deleted?:boolean, created_at?:string, updated_at?:string) {
-    this.id = id;
-    this.name = name;
-    this.lastname = lastname;
-    this.deleted = deleted;
-    this.created_at = created_at;
-    this.updated_at = updated_at;
-  }
-
-  static async authUser(login:string, password: string):Promise<User | { error: string }> {
+  static async authUser(login:string, password: string):Promise<{ user?: UserInterface, error?: string }> {
     if (!login || !password) { return { error: 'Login or password not found' } }
 
     const query = `
       select
-        ${userDbKeys.join(',')}
+        ${User.userDbKeys.join(',')}
       from users u
       where u.password = crypt(${password}, u.password)
       and u.login = ${login}
@@ -52,13 +40,13 @@ export class User implements UserInterface {
       return { error }
     }
     
-    return new User(row.id, row.name, row.lastname, row.deleted, row.created_at, row.updated_at);
+    return { user: row };
   }
 
   static async getUserById(id:number):Promise<{ user?: UserInterface,  error?: string }> {
     const query = `
       select
-        ${userDbKeys.join(',')}
+        ${User.userDbKeys.join(',')}
       from users u
       where u.id = $
     `;

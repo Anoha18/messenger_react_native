@@ -22,5 +22,9 @@ export default new Strategy(options, async (payload:PayloadJWT, done:VerifiedCal
     return done(error);
   }
 
+  if (!user) {
+    return done('User not found');
+  }
+
   done(null, user);
 });
