@@ -1,2 +1,3 @@
 export const SET_USER = 'SET_USER';
 export const CONNECT_SOCKET = 'CONNECT_SOCKET';
+export const SET_CONNECT_SOCKET = 'SET_CONNECT_SOCKET';

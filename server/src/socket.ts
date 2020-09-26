@@ -1,4 +1,4 @@
-import io, { Server, ServerOptions } from 'socket.io';
+import io, { Server, ServerOptions, Socket } from 'socket.io';
 import MainServer from './server';
 
 export default class {
@@ -11,8 +11,8 @@ export default class {
   }
 
   private connection():void {
-    this.io.on('connection', socket => {
-      console.log('Connect new socket: ', socket);
+    this.io.on('connection', (socket:Socket) => {
+      console.log('Connect new socket: ', socket.id);
     })
   }
 }

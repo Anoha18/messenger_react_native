@@ -6,7 +6,7 @@ const handlers = {
     user
   }),
   DEFAULT: (state) => ({
-    ...state
+    state
   })
 }
 

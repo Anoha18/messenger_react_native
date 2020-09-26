@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import store from './store';
+import { connectSocket } from './store/actions/socket';
 
-const App: () => React$Node = () => {
-  console.log('HIIIIII');
+const AppWrap = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(connectSocket());
+  }, [])
 
   return (
+    <View>
+      <Text>
+        Hello world
+      </Text>
+    </View>
+  )
+}
+
+const App: () => React$Node = () => {
+  return (
     <Provider store={store}>
-      <View>
-        <Text>Hello world</Text>
-      </View>
+      <AppWrap />
     </Provider>
   );
 };
