@@ -1,22 +1,26 @@
-import { SET_USER } from '../types';
+import {
+  SET_USER,
+  SET_ACCESS_TOKEN,
+  SET_REFRESH_TOKEN
+} from '../types';
 import { SERVER } from '../../config';
 import axios from 'axios';
-
-export const setUser = (user) => {
-  return {
-    type: SET_USER,
-    user
-  }
-}
+import { connectSocket } from './socket';
 
 export const authUser = (loginData) => async (dispatch) => {
   try {
-    // const { data } = await axios.post(`${SERVER.URL}${SERVER.API_PATH}/auth/login`, loginData);
-    // const { error, result } = data;
+    const { data } = await axios.post(`${SERVER.URL}/auth/login`, loginData);
+    const { error, result } = data;
 
-    // if (error) { return { error } }
+    if (error) { return { error } }
 
-    dispatch(setUser({ id: 1, ...loginData }));
+    if (!result) { return { error: 'Result not found' } }
+
+    const { user, accessToken, refreshToken } = result;
+    dispatch({ type: SET_USER, user });
+    dispatch({ type: SET_ACCESS_TOKEN, accessToken });
+    dispatch({ type: SET_REFRESH_TOKEN, refreshToken });
+    dispatch(connectSocket(user));
   } catch (error) {
     console.error(error);
     return { error: error.message }

@@ -13,6 +13,7 @@ export default class {
   private connection():void {
     this.io.on('connection', (socket:Socket) => {
       console.log('Connect new socket: ', socket.id);
+      console.log('Headers: ', socket.handshake.headers);
     })
   }
 }

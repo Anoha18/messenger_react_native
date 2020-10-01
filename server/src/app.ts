@@ -22,7 +22,13 @@ export default class App {
   }
 
   public middlewares(middlewares: Array<any>):void {
-    middlewares.forEach(middleware => this.app.use(middleware));
+    middlewares.forEach(middleware => {
+      if (typeof middleware === 'function') {
+        this.app.use(middleware);
+      } else if (middleware.path) {
+        this.app.use(middleware.path, middleware.func);
+      }
+    });
   }
 
   public routes(routes: Array<AppRoute>):void {

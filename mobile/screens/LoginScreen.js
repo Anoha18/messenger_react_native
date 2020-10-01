@@ -20,7 +20,8 @@ export default ({ navigation }) => {
 
   const submit = async() => {
     setLoading(true);
-    dispatch(await authUser({ login, password }))
+    const { error } = await dispatch(await authUser({ login, password }))
+    console.log(result);
     setLoading(false);
   }
 
@@ -36,12 +37,12 @@ export default ({ navigation }) => {
         </View>
         <View style={{ marginTop: 15 }}>
           <Item floatingLabel>
-            <Label style={styles.formLabel}>Логин</Label>
+            <Label>Логин</Label>
             <Input textContentType={'username'} onChangeText={(text) => setLogin(text)} />
           </Item>
           <Item style={{ marginTop: 7 }} floatingLabel>
             <Icon name="locked" />
-            <Label style={styles.formLabel}>Пароль</Label>
+            <Label>Пароль</Label>
             <Input textContentType={'password'} secureTextEntry={true} onChangeText={(text) => setPassword(text)} />
           </Item>
         </View>
@@ -75,7 +76,4 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center'
   },
-  formLabel: {
-    paddingLeft: 10,
-  }
 });

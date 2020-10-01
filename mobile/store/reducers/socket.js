@@ -6,7 +6,7 @@ const handlers = {
     connect
   }),
   DEFAULT: (state) => ({
-    state
+    ...state
   })
 }
 

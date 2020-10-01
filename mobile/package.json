@@ -18,6 +18,8 @@
     "axios": "^0.20.0",
     "native-base": "https://github.com/fdkitlui/NativeBase.git",
     "react": "16.13.1",
+    "react-devtools": "^4.8.2",
+    "react-devtools-core": "^4.8.2",
     "react-native": "0.63.2",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-reanimated": "^1.13.1",

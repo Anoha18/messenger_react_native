@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
-import { useSelector, useDispatch } from 'react-redux';
-import { connectSocket } from '../store/actions/socket';
+import { useDispatch, useSelector } from 'react-redux';
+import { checkServer } from '../store/actions/server';
 
 import LoginScreen from './LoginScreen';
 import RegistrationSreen from './RegistrationSreen';
@@ -15,9 +15,11 @@ export default ({ navigation }) => {
   const { user } = useSelector(state => state.user);
 
   useEffect(() => {
-    if (user) {
-      dispatch(connectSocket(user));
-    }
+    // const _checkServer = async() => {
+    //   await dispatch(await checkServer());
+    // }
+
+    // _checkServer();
   })
 
   return (

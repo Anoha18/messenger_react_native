@@ -1,6 +1,7 @@
 import { VerifiedCallback } from 'passport-jwt';
 import { Strategy } from 'passport-local';
 import { User } from '../models';
+
 const opts = { usernameField: 'login', passwordField: 'password' }
 
 export default new Strategy(opts, async(login: string, password: string, done:VerifiedCallback) => {
