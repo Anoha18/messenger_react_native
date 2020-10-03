@@ -1,30 +1,21 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
-import { useDispatch, useSelector } from 'react-redux';
-import { checkServer } from '../store/actions/server';
+import { useSelector } from 'react-redux';
 
 import LoginScreen from './LoginScreen';
 import RegistrationSreen from './RegistrationSreen';
 import HomeScreen from './HomeScreen';
+import RoomScreen from './RoomScreen';
 
-const Stact = createStackNavigator();
+const Stack = createStackNavigator();
 
 export default ({ navigation }) => {
-  const dispatch = useDispatch();
   const { user } = useSelector(state => state.user);
-
-  useEffect(() => {
-    // const _checkServer = async() => {
-    //   await dispatch(await checkServer());
-    // }
-
-    // _checkServer();
-  })
 
   return (
     <NavigationContainer>
-      <Stact.Navigator
+      <Stack.Navigator
         screenOptions={{
           gestureEnabled: true,
           gestureDirection: 'horizontal',
@@ -34,30 +25,42 @@ export default ({ navigation }) => {
         {!user
           ? (
             <>
-              <Stact.Screen
+              <Stack.Screen
                 name="login"
                 component={LoginScreen}
                 options={{
                   headerShown: false,
                 }}
               />
-              <Stact.Screen
+              <Stack.Screen
                 name="registration"
                 component={RegistrationSreen}
                 options={{
                   title: 'Регистрация',
-                  animationEnabled: true
+                  animationEnabled: true,
                 }}
               />
             </>
           ) : (
-            <Stact.Screen
-              name="home"
-              component={HomeScreen}
-            />
+            <>
+              <Stack.Screen
+                name="home"
+                component={HomeScreen}
+                options={{
+                  headerTitle: 'Чаты',
+                  headerTitleStyle: {
+                    alignSelf: 'center'
+                  }
+                }}
+              />
+              <Stack.Screen
+                name="room"
+                component={RoomScreen}
+              />
+            </>
           )
         }
-      </Stact.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   )
 }

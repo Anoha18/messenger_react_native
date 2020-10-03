@@ -4,7 +4,7 @@ import { SERVER, SOCKET } from '../../config';
 
 let socket = null;
 
-export const connectSocket = (user) => (dispatch, getState) => {
+export const connectSocket = () => (dispatch, getState) => {
   const { user } = getState();
   if (!user) return { error: 'Not found user' }
 

@@ -5,7 +5,8 @@ import {
 } from '../types';
 import { SERVER } from '../../config';
 import axios from 'axios';
-import { connectSocket } from './socket';
+import { connectSocket, disconnectSocket } from './socket';
+import api from '../../Api';
 
 export const authUser = (loginData) => async (dispatch) => {
   try {
@@ -20,9 +21,26 @@ export const authUser = (loginData) => async (dispatch) => {
     dispatch({ type: SET_USER, user });
     dispatch({ type: SET_ACCESS_TOKEN, accessToken });
     dispatch({ type: SET_REFRESH_TOKEN, refreshToken });
-    dispatch(connectSocket(user));
+    dispatch(connectSocket());
+    api.setToken(accessToken);
   } catch (error) {
     console.error(error);
     return { error: error.message }
+  }
+}
+
+export const logoutUser = () => async(dispatch, getState) => {
+  const { user } = getState();
+  if (!user) return { error: 'Not found user' };
+
+  try {
+    const { data } = await api.get('/logout');
+
+    dispatch({ type: SET_USER, user: null });
+    dispatch({ type: SET_ACCESS_TOKEN, accessToken: null });
+    dispatch({ type: SET_REFRESH_TOKEN, refreshToken: null });
+    dispatch(disconnectSocket());
+  } catch (error) {
+    console.error('ERROR LOGOUT: ', error);
   }
 }

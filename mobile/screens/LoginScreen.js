@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { Item, Input, Label, Button, Text } from 'native-base';
-import Icon from 'react-native-vector-icons/Fontisto'
 import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { authUser } from '../store/actions/user';
@@ -41,7 +40,6 @@ export default ({ navigation }) => {
             <Input textContentType={'username'} onChangeText={(text) => setLogin(text)} />
           </Item>
           <Item style={{ marginTop: 7 }} floatingLabel>
-            <Icon name="locked" />
             <Label>Пароль</Label>
             <Input textContentType={'password'} secureTextEntry={true} onChangeText={(text) => setPassword(text)} />
           </Item>
