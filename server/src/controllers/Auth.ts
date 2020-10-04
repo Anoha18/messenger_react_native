@@ -31,6 +31,8 @@ export default class AuthController {
 
       if (error) { return res.json({ error }) }
 
+      if (info) { return res.json({ error: info }) }
+
       if (!user) { return res.json({ error: 'Логин или пароль неверный' }) }
 
       const tokenPayload = { id: user.id };

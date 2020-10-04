@@ -1,6 +1,7 @@
 import React from 'react';
-import { FlatList, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { List, ListItem, Thumbnail, Body, Left, Right, Badge } from 'native-base';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default ({
   roomList,
@@ -12,9 +13,13 @@ export default ({
       {roomList.map(room => (
         <ListItem onPressOut={() => onSelectRoom(room.id)} avatar>
           <Left>
-            <Thumbnail />
+            {
+              room.avatar_url
+                ? <Thumbnail source={{ uri: room.avatar_url }} />
+                : <Icon name="user-circle-o" size={35} />
+            }
           </Left>
-          <Body>
+          <Body style={styles.body}>
             <Text style={styles.itemTitle}>{room.name}</Text>
             <Text style={styles.itemDescription}>{room.last_message}</Text>
           </Body>
@@ -44,4 +49,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 'bold'
   },
+  body: {
+    paddingBottom: 20
+  }
 })

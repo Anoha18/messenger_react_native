@@ -20,7 +20,10 @@ export default ({ navigation }) => {
   const submit = async() => {
     setLoading(true);
     const { error } = await dispatch(await authUser({ login, password }))
-    console.log(result);
+    if (error) {
+      alert(error)
+      // setErrorResponse(error);
+    }
     setLoading(false);
   }
 

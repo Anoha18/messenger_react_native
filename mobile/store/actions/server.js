@@ -22,6 +22,7 @@ export const checkServer = () => async (dispatch) => {
       error: 'Server not working'
     })
   } catch (error) {
+    console.log('ERROR CHECK SERVER: ', error);
     dispatch({
       type: SET_SERVER_ERROR,
       error: error.message

@@ -4,13 +4,14 @@ import { SERVER } from './config';
 class Api {
   url = null;
   token = null;
+  timeout = 3000;
 
   constructor(url, path) {
     this.url = `${url || SERVER.URL}${path || SERVER.API_PATH}`;
   }
 
   checkServer() {
-    return axios.get(SERVER.URL, '/ping');
+    return axios.get(`${SERVER.URL}/ping`, { timeout: this.timeout });
   }
 
   setToken(token) {
@@ -24,7 +25,7 @@ class Api {
   get(path, params) {
     return axios.get(`${this.url}${path}`, {
       headers: {
-        Authorization: this.token ? `Bearer ${this.token}` : undefined
+        Authorization: this.token ? `Bearer ${this.token}` : undefined,
       },
       ...params
     });
