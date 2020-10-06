@@ -108,6 +108,8 @@ const MainTabNav = () => (
 export default ({ navigation }) => {
   const { user } = useSelector(state => state.user);
 
+  
+
   return (
     <NavigationContainer>
         {!user

@@ -50,7 +50,7 @@ export class User {
       select
         ${User.userDbKeys.join(',')}
       from users u
-      where u.id = $
+      where u.id = $1
     `;
     const { error, row } = await singleQuery(query, [id]);
     if (error) {

@@ -17,7 +17,7 @@ export const connectSocket = () => (dispatch, getState) => {
     transportOptions: {
       polling: {
         extraHeaders: {
-          'Authorization': accessToken
+          'Authorization': `Bearer ${accessToken}`
         }
       }
     }
