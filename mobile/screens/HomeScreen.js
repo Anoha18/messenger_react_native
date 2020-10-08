@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import RoomList from '../components/RoomList';
+import { connect } from 'react-redux';
 
 const random = (max, min) => Math.random() * (max - min) + min;
 
@@ -19,7 +20,10 @@ const mockRoomList = () => {
   return data;
 }
 
-export default ({ navigation }) => {
+const HomeScreen = ({
+  navigation,
+  getChatRoomList
+}) => {
   return (
     <ScrollView style={styles.container}>
       <RoomList
@@ -29,6 +33,11 @@ export default ({ navigation }) => {
     </ScrollView>
   )
 }
+
+export default connect(
+  null,
+  {}
+)(HomeScreen)
 
 const styles = StyleSheet.create({
   container: {

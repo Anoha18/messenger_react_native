@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { DB } from '../config';
+import { DB } from './config';
 
 const logger = (messages:any) => {
   console.log('PG POOL LOG: ', messages);

@@ -5,7 +5,7 @@ import {
 } from '../types';
 import { SERVER } from '../../config';
 import axios from 'axios';
-import { connectSocket, disconnectSocket } from './socket';
+// import { connectSocket, disconnectSocket } from './socket';
 import api from '../../Api';
 
 export const authUser = (loginData) => async (dispatch) => {
@@ -21,7 +21,7 @@ export const authUser = (loginData) => async (dispatch) => {
     dispatch({ type: SET_USER, user });
     dispatch({ type: SET_ACCESS_TOKEN, accessToken });
     dispatch({ type: SET_REFRESH_TOKEN, refreshToken });
-    dispatch(connectSocket());
+    // dispatch(connectSocket());
     api.setToken(accessToken);
   } catch (error) {
     console.error(error);
@@ -39,7 +39,7 @@ export const logoutUser = () => async(dispatch, getState) => {
     dispatch({ type: SET_USER, user: null });
     dispatch({ type: SET_ACCESS_TOKEN, accessToken: null });
     dispatch({ type: SET_REFRESH_TOKEN, refreshToken: null });
-    dispatch(disconnectSocket());
+    // dispatch(disconnectSocket());
   } catch (error) {
     console.error('ERROR LOGOUT: ', error);
   }

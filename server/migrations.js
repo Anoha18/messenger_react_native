@@ -1,4 +1,4 @@
-const { DB } = require('./config');
+const { DB } = require('./src/config');
 
 module.exports = {
   dev: {

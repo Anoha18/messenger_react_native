@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import { UserInterface, User } from '../models';
-import { JWT } from '../../config';
+import { JWT } from '../config';
 
 const generateAccessJWT = (payload: any) => jwt
   .sign(payload, JWT.ACCESS_JWT_SECRET, { expiresIn: JWT.ACCESS_JWT_LIFE });

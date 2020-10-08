@@ -1,8 +1,15 @@
 import io from 'socket.io-client';
-import { SET_CONNECT_SOCKET } from '../types';
+import {
+  SET_CONNECT_SOCKET,
+  SET_CHAT_ROOM_LIST
+} from '../types';
 import { SERVER, SOCKET } from '../../config';
 
-let socket = null;
+let socket;
+
+const actionHandlers = {
+  chatRoomList: (chatRoomList) => ({ type: SET_CHAT_ROOM_LIST, chatRoomList })
+}
 
 export const connectSocket = () => (dispatch, getState) => {
   const { user } = getState();
@@ -12,6 +19,9 @@ export const connectSocket = () => (dispatch, getState) => {
   if (!accessToken) return { error: 'Not found acess token' }
 
   socket = io.connect(SERVER.URL, {
+    query: {
+      user_id: user.user.id
+    },
     path: SOCKET.PATH,
     rejectUnauthorized: false,
     transportOptions: {
@@ -22,7 +32,9 @@ export const connectSocket = () => (dispatch, getState) => {
       }
     }
   });
+  console.log('HERE SOCKET');
   socket.on('connect', () => {
+    console.log('CONNECT SOCKET');
     dispatch({
       type: SET_CONNECT_SOCKET,
       connect: true
@@ -35,6 +47,10 @@ export const connectSocket = () => (dispatch, getState) => {
       connect: false
     });
   })
+  socket.on('event', (data) => {
+    if (!data.action) return console.error('SOCKET EVENT WITHOUT ACTION');
+    dispatch(actionHandlers[data.params]);
+  })
 };
 
 export const disconnectSocket = () => {
@@ -46,4 +62,17 @@ export const disconnectSocket = () => {
     type: SET_CONNECT_SOCKET,
     connect: false,
   };
+}
+
+export const getChatRoomList = () => {
+  if (socket) {
+    console.log('GET CHAT ROOM LIST');
+    socket.emit('request', {
+      action: 'getChatRoomList',
+    })
+  };
+
+  return {
+    type: ''
+  }
 }

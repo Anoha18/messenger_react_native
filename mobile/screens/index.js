@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import IconAntd from 'react-native-vector-icons/AntDesign';
 import { RoomHeader } from '../headers';
+import { connectSocket, disconnectSocket } from '../store/actions/socket';
 
 import LoginScreen from './LoginScreen';
 import RegistrationSreen from './RegistrationSreen';
@@ -106,9 +107,17 @@ const MainTabNav = () => (
 )
 
 export default ({ navigation }) => {
+  const dispatch = useDispatch();
   const { user } = useSelector(state => state.user);
 
-  
+  useEffect(() => {
+    if (user) {
+      dispatch(connectSocket())
+    }
+    if (!user) {
+      dispatch(disconnectSocket());
+    }
+  }, [user])
 
   return (
     <NavigationContainer>

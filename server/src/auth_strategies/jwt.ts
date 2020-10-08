@@ -1,5 +1,5 @@
 import { Strategy, ExtractJwt, VerifiedCallback } from 'passport-jwt';
-import { JWT } from '../../config';
+import { JWT } from '../config';
 import { User } from '../models'
 
 const options = {

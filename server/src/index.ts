@@ -1,5 +1,5 @@
 import App from './app';
-import { SERVER, SOCKET } from '../config';
+import { SERVER, SOCKET } from './config';
 import middlewares from './middlewares';
 import Server from './server';
 import Socket from './socket';
