@@ -15,5 +15,8 @@ module.exports = {
     PASSWORD: '0000',
     HOST: 'localhost',
     PORT: 5432
+  },
+  SOCKET: {
+    PATH: '/socket'
   }
 };

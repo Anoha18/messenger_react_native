@@ -1,31 +1,14 @@
-import io, { Handshake, Server, ServerOptions, Socket } from 'socket.io';
+import io, { Server, ServerOptions } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import MainServer from './server';
 import { JWT } from './config';
-import { User, UserInterface } from './models';
-
-interface HandshakeUser extends Handshake {
-  user?: UserInterface
-}
-
-interface SocketUser extends Socket {
-  handshake: HandshakeUser
-}
-
-interface ConnectedUser {
-  user_id: number,
-  socket_id: string
-}
-
-interface RequestEventPayload {
-  action: string,
-  params?: any,
-}
+import { UserInterface } from './models';
+import { SocketInterfaces } from './interfaces';
 
 export default class {
   private io:Server;
-  private users:Array<ConnectedUser> = [];
-  private sockets:Array<SocketUser> = [];
+  private users:Array<SocketInterfaces.ConnectedUser> = [];
+  private sockets:Array<SocketInterfaces.SocketUser> = [];
 
   constructor(server:MainServer, options?: ServerOptions) {
     this.io = io(server.getServer(), options);
@@ -35,18 +18,14 @@ export default class {
   }
 
   private connection():void {
-    this.io.on('connection', (socket:SocketUser) => {
-      console.log('Connect new socket: ', socket.id);
-      console.log('Headers: ', socket.handshake.headers);
-
-      socket.on('disconnect', this.disconnect);
-
+    this.io.on('connection', (socket:SocketInterfaces.SocketUser) => {
+      socket.on('disconnect', (reason) => this.disconnect(socket, reason));
       socket.on('request', (args) => this.request(socket, args))
     })
   }
 
   private checkAuthorization():void {
-    this.io.use(async(socket: SocketUser, next) => {
+    this.io.use(async(socket: SocketInterfaces.SocketUser, next) => {
       try {
         if (!socket.handshake.headers.authorization) { return next(new Error('Authorization error: Not authorization header')) }
         const { authorization }: { authorization: string } = socket.handshake.headers;
@@ -97,15 +76,16 @@ export default class {
     }
   }
 
-  private disconnect(socket:SocketUser) {
+  private disconnect(socket:SocketInterfaces.SocketUser, reason:string) {
     const { handshake: { user } } = socket;
+    console.log('Disconnect user reason: ', reason);
     console.log('Disconnected socket: ', socket.id);
     console.log('Disconnected user id: ', user && user.id);
-    this.users.slice(this.users.findIndex(_user => _user.user_id === (user && user.id)), 1);
-    this.sockets.slice(this.sockets.findIndex(_socket => _socket.id === socket.id));
+    this.users.splice(this.users.findIndex(_user => _user.user_id === (user && user.id)), 1);
+    this.sockets.splice(this.sockets.findIndex(_socket => _socket.id === socket.id));
   }
 
-  private request(socket:SocketUser, payload:RequestEventPayload) {
+  private request(socket:SocketInterfaces.SocketUser, payload:SocketInterfaces.RequestEventPayload) {
     console.log('HERE PAYLOAD: ', payload);
     console.log('HERE USERS: ', this.users);
     console.log('HERE SOCKET: ', socket);

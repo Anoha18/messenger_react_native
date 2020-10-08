@@ -4,7 +4,8 @@ import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSelector, useDispatch } from 'react-redux';
 import IconAntd from 'react-native-vector-icons/AntDesign';
-import { RoomHeader } from '../headers';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { RoomHeader, SearchUsersHeader } from '../headers';
 import { connectSocket, disconnectSocket } from '../store/actions/socket';
 
 import LoginScreen from './LoginScreen';
@@ -12,16 +13,31 @@ import RegistrationSreen from './RegistrationSreen';
 import HomeScreen from './HomeScreen';
 import RoomScreen from './RoomScreen';
 import SettingsScreen from './SettingsScreen';
+import SearchUserScreen from './SearchUserScreen';
 
-const IconTabsHome = {
-  home: 'message1',
-  settings: 'setting',
+const TabsHome = {
+  home: {
+    icon: 'message1',
+    label: 'Сообщения',
+    iconProvider: 'Antd'
+  },
+  settings: {
+    icon: 'setting',
+    label: 'Настройки',
+    iconProvider: 'Antd'
+  },
+  search_user: {
+    icon: 'account-search-outline',
+    label: 'Поиск',
+    iconProvider: 'MaterialCommunity'
+  }
 };
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const SettingStack = createStackNavigator();
+const SearchUserStack = createStackNavigator();
 
 const HomeStackScreen = () => (
   <HomeStack.Navigator
@@ -56,8 +72,38 @@ const SettingsStackScreen = () => (
     <SettingStack.Screen
       name="settings"
       component={SettingsScreen}
+      options={{
+        headerTitle: 'Настройки',
+        headerShown: true,
+        headerTitleStyle: {
+          alignSelf: 'center'
+        }
+      }}
     />
   </SettingStack.Navigator>
+);
+
+const SearchUserStackScreen = () => (
+  <SearchUserStack.Navigator
+    screenOptions={{
+      gestureEnabled: true,
+      gestureDirection: 'horizontal',
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+    }}
+  >
+    <SearchUserStack.Screen
+      name="search_user"
+      component={SearchUserScreen}
+      options={{
+        headerTitle: 'Поиск',
+        headerShown: true,
+        headerTitleStyle: {
+          alignSelf: 'center'
+        },
+        header: SearchUsersHeader
+      }}
+    />
+  </SearchUserStack.Navigator>
 );
 
 const LoginStackScreen = () => (
@@ -88,13 +134,25 @@ const LoginStackScreen = () => (
 
 const MainTabNav = () => (
   <Tab.Navigator
+    initialRouteName="home"
     screenOptions={({ route }) => ({
-      tabBarIcon: ({ focused, color, size }) => {
-        let iconName = IconTabsHome[route.name] || '';
-        return <IconAntd name={iconName} size={size} color={color} />
+      tabBarIcon({ focused, color, size }) {
+        const tabInfo = TabsHome[route.name] || null;
+        if (!tabInfo) return;
+
+        if (tabInfo.iconProvider === 'Antd') {
+          return <IconAntd name={tabInfo.icon} size={size} color={color} />
+        } else if (tabInfo.iconProvider === 'MaterialCommunity') {
+          return <MaterialCommunityIcon name={tabInfo.icon} size={size} color={color} />
+        }
       },
+      tabBarLabel: TabsHome[route.name].label,
     })}
   >
+    <Tab.Screen
+      name="search_user"
+      component={SearchUserStackScreen}
+    />
     <Tab.Screen
       name="home"
       component={HomeStackScreen}
@@ -117,7 +175,13 @@ export default ({ navigation }) => {
     if (!user) {
       dispatch(disconnectSocket());
     }
-  }, [user])
+  }, [user]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(disconnectSocket());
+    }
+  }, []);
 
   return (
     <NavigationContainer>
@@ -132,6 +196,7 @@ export default ({ navigation }) => {
                   gestureDirection: 'horizontal',
                   cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
                 }}
+                initialRouteName="main"
               >
                 <Stack.Screen
                   name="main"

@@ -8,7 +8,7 @@ import { checkServer } from './store/actions/server';
 const AppWrap = () => {
   useEffect(() => {
     store.dispatch(checkServer());
-  })
+  }, []);
   
   return (
     <Provider store={store}>
