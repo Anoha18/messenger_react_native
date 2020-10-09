@@ -2,13 +2,14 @@ import io, { Server, ServerOptions } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import MainServer from './server';
 import { JWT } from './config';
-import { UserInterface } from './models';
-import { SocketInterfaces } from './interfaces';
+import { User } from './models';
+import { ConnectedUser, SocketUser, RequestEventPayload } from './interfaces/socket';
+import { UserInterface } from './interfaces/user';
 
 export default class {
   private io:Server;
-  private users:Array<SocketInterfaces.ConnectedUser> = [];
-  private sockets:Array<SocketInterfaces.SocketUser> = [];
+  private users:Array<ConnectedUser> = [];
+  private sockets:Array<SocketUser> = [];
 
   constructor(server:MainServer, options?: ServerOptions) {
     this.io = io(server.getServer(), options);
@@ -18,14 +19,14 @@ export default class {
   }
 
   private connection():void {
-    this.io.on('connection', (socket:SocketInterfaces.SocketUser) => {
+    this.io.on('connection', (socket:SocketUser) => {
       socket.on('disconnect', (reason) => this.disconnect(socket, reason));
       socket.on('request', (args) => this.request(socket, args))
     })
   }
 
   private checkAuthorization():void {
-    this.io.use(async(socket: SocketInterfaces.SocketUser, next) => {
+    this.io.use(async(socket: SocketUser, next) => {
       try {
         if (!socket.handshake.headers.authorization) { return next(new Error('Authorization error: Not authorization header')) }
         const { authorization }: { authorization: string } = socket.handshake.headers;
@@ -76,7 +77,7 @@ export default class {
     }
   }
 
-  private disconnect(socket:SocketInterfaces.SocketUser, reason:string) {
+  private disconnect(socket:SocketUser, reason:string) {
     const { handshake: { user } } = socket;
     console.log('Disconnect user reason: ', reason);
     console.log('Disconnected socket: ', socket.id);
@@ -85,7 +86,7 @@ export default class {
     this.sockets.splice(this.sockets.findIndex(_socket => _socket.id === socket.id));
   }
 
-  private request(socket:SocketInterfaces.SocketUser, payload:SocketInterfaces.RequestEventPayload) {
+  private request(socket:SocketUser, payload:RequestEventPayload) {
     console.log('HERE PAYLOAD: ', payload);
     console.log('HERE USERS: ', this.users);
     console.log('HERE SOCKET: ', socket);

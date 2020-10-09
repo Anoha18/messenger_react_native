@@ -1,18 +1,7 @@
-import { singleQuery } from '../db';
+import { singleQuery, multiQuery } from '../db';
+import { UserInterface, SearchUserParam } from '../interfaces/user';
 
-export interface UserInterface {
-  id: number,
-  login: string,
-  name?: string,
-  lastname?: string,
-  deleted?: boolean,
-  created_date?: string,
-  created_time?: string,
-  updated_date?: string,
-  updated_time?: string,
-}
-
-export class User {
+export default class User {
   static userDbKeys = [
     'u.id',
     'u.name',
@@ -58,5 +47,20 @@ export class User {
     }
 
     return { user: row };
+  }
+
+  static async searchUser(params: SearchUserParam):Promise<{ userList?: Array<UserInterface>, error?: string }> {
+    const { searchText } = params;
+    const _searchText = `%${searchText.toLowerCase()}%`;
+    const { rows, error } = await multiQuery(`
+      select ${User.userDbKeys.join(',')}
+      from users u
+      where lower(u.name) like '${_searchText}'
+      or lower(u.lastname) like '${_searchText}'
+      or lower(u.login) like '${searchText}'
+      and u.deleted = false
+    `);
+    if (error) return { error }
+    return { userList: rows }
   }
 }

@@ -1,13 +1,26 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Container, Header, Item, Input, Text, Icon, Button } from 'native-base';
 
 const SearchUsersHeader = (props) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Поиск
-      </Text>
-    </View>
+    <Container>
+      <Header searchBar rounded>
+        <Item>
+          <Icon name="ios-search" />
+          <Input placeholder="Поиск" />
+          <Icon name="ios-people" />
+        </Item>
+        <Button transparent>
+          <Text>Search</Text>
+        </Button>
+      </Header>
+    </Container>
+    // <View style={styles.container}>
+    //   <Text style={styles.title}>
+    //     Поиск
+    //   </Text>
+    // </View>
   )
 }
 

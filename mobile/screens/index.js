@@ -83,29 +83,6 @@ const SettingsStackScreen = () => (
   </SettingStack.Navigator>
 );
 
-const SearchUserStackScreen = () => (
-  <SearchUserStack.Navigator
-    screenOptions={{
-      gestureEnabled: true,
-      gestureDirection: 'horizontal',
-      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
-    }}
-  >
-    <SearchUserStack.Screen
-      name="search_user"
-      component={SearchUserScreen}
-      options={{
-        headerTitle: 'Поиск',
-        headerShown: true,
-        headerTitleStyle: {
-          alignSelf: 'center'
-        },
-        header: SearchUsersHeader
-      }}
-    />
-  </SearchUserStack.Navigator>
-);
-
 const LoginStackScreen = () => (
   <Stack.Navigator
     screenOptions={{
@@ -139,7 +116,6 @@ const MainTabNav = () => (
       tabBarIcon({ focused, color, size }) {
         const tabInfo = TabsHome[route.name] || null;
         if (!tabInfo) return;
-
         if (tabInfo.iconProvider === 'Antd') {
           return <IconAntd name={tabInfo.icon} size={size} color={color} />
         } else if (tabInfo.iconProvider === 'MaterialCommunity') {
@@ -151,7 +127,7 @@ const MainTabNav = () => (
   >
     <Tab.Screen
       name="search_user"
-      component={SearchUserStackScreen}
+      component={SearchUserScreen}
     />
     <Tab.Screen
       name="home"

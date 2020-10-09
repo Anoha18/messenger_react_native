@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, StatusBar } from 'react-native';
 import RoomList from '../components/RoomList';
 import { connect } from 'react-redux';
 
@@ -26,6 +26,7 @@ const HomeScreen = ({
 }) => {
   return (
     <ScrollView style={styles.container}>
+      <StatusBar backgroundColor="#8E8E8F" />
       <RoomList
         roomList={mockRoomList()}
         onSelectRoom={(id) => navigation.push('room', { id })}

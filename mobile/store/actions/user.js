@@ -44,3 +44,25 @@ export const logoutUser = () => async(dispatch, getState) => {
     console.error('ERROR LOGOUT: ', error);
   }
 }
+
+export const searchUsers = ({ searchText, offset, limit }) => async(dispatch) => {
+  try {
+    const { data } = await api.get('/user/by', {
+      params: {
+        searchText,
+        offset,
+        limit
+      }
+    });
+
+    const { result, error } = data;
+    if (error) return { error }
+
+    return {
+      userList: result
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}

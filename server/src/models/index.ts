@@ -1,6 +1,5 @@
-import { User, UserInterface } from './User';
+import User from './User';
 
 export {
-  User,
-  UserInterface
+  User
 };

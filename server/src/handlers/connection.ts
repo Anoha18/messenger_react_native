@@ -1,5 +1,5 @@
-import { SocketInterfaces } from '../interfaces';
+import { SocketUser } from '../interfaces/socket';
 
-export default (socket:SocketInterfaces.SocketUser) => {
+export default (socket:SocketUser) => {
   
 }

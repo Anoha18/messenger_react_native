@@ -1,5 +1,5 @@
 import io, { Handshake, Socket } from 'socket.io';
-import { UserInterface } from '../models';
+import { UserInterface } from './user';
 
 interface HandshakeUser extends Handshake {
   user?: UserInterface

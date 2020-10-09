@@ -27,7 +27,7 @@ class Api {
       headers: {
         Authorization: this.token ? `Bearer ${this.token}` : undefined,
       },
-      ...params
+      ...params,
     });
   }
 

@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import BaseController from './BaseController';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import { UserInterface, User } from '../models';
+import { UserInterface } from '../interfaces/user';
 import { JWT } from '../config';
 
 const generateAccessJWT = (payload: any) => jwt
@@ -10,17 +11,13 @@ const generateAccessJWT = (payload: any) => jwt
 const generateRefreshJWT = (payload: any) => jwt
   .sign(payload, JWT.REFRESH_JWT_SECRET, { expiresIn: JWT.REFRESH_JWT_LIFE });
 
-export default class AuthController {
-  private router!:Router;
-
+export default class AuthController extends BaseController {
   constructor() {
-    this.router = Router();
+    super();
     this.initRoutes();
   }
 
-  public getRouter() { return this.router; }
-
-  private initRoutes() {
+  private initRoutes(): void {
     this.router.post('/login', this.login);
   }
 
