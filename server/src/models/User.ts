@@ -1,5 +1,9 @@
 import { singleQuery, multiQuery } from '../db';
-import { UserInterface, SearchUserParam } from '../interfaces/user';
+import {
+  UserInterface,
+  SearchUserParam,
+  UserRegisterData
+} from '../interfaces/user';
 
 export default class User {
   static userDbKeys = [
@@ -55,12 +59,24 @@ export default class User {
     const { rows, error } = await multiQuery(`
       select ${User.userDbKeys.join(',')}
       from users u
-      where lower(u.name) like '${_searchText}'
+      where u.deleted = false
+      and u.id != ${params.userId}
+      and (lower(u.name) like '${_searchText}'
       or lower(u.lastname) like '${_searchText}'
-      or lower(u.login) like '${searchText}'
-      and u.deleted = false
+      or lower(u.login) like '${searchText}')
     `);
     if (error) return { error }
     return { userList: rows }
+  }
+
+  static async registerUser(params: UserRegisterData): Promise<{ userid?: number, error?: string }> {
+    const { row, error } : { row?: { id: number }, error?: string } = await singleQuery(`
+      insert into users (name, login, password)
+      values ($1, $2, crypt($3, gen_salt('bf', 8)))
+      returning id
+    `, [params.name, params.login, params.password]);
+    if (error) return { error }
+
+    return { userid: row?.id }
   }
 }

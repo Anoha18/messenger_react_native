@@ -66,3 +66,20 @@ export const searchUsers = ({ searchText, offset, limit }) => async(dispatch) =>
     return { error: error.message }
   }
 }
+
+export const registerUser = (params) => async(dispatch) => {
+  try {
+    const { data } = await axios.post(`${SERVER.URL}/auth/registration`, params);
+    const { error } = data;
+    
+    if (error) return { error }
+
+    await dispatch(await authUser({
+      login: params.login,
+      password: params.password
+    }));
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}

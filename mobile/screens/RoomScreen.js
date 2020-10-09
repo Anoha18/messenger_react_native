@@ -14,9 +14,7 @@ export default ({ route }) => {
     setMessageList(oldMessageList => [messages[0], ...oldMessageList])
   }
 
-  const renderEmptyChat = (
-    <Text>сообщений нет</Text>
-  )
+  const renderEmptyChat = <Text>сообщений нет</Text>
 
   return (
     <GiftedChat

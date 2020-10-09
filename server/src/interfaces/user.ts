@@ -1,7 +1,8 @@
 export interface SearchUserParam {
   searchText: string,
   limit?: number,
-  offset?: number
+  offset?: number,
+  userId: number
 }
 
 export interface UserInterface {
@@ -14,4 +15,10 @@ export interface UserInterface {
   created_time?: string,
   updated_date?: string,
   updated_time?: string,
+}
+
+export interface UserRegisterData {
+  name: string,
+  login: string,
+  password: string
 }
