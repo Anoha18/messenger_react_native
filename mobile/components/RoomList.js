@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { List, ListItem, Thumbnail, Body, Left, Right, Badge } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import EvilIcon from 'react-native-vector-icons/EvilIcons';
 
 export default ({
   roomList,
@@ -15,8 +15,8 @@ export default ({
           <Left>
             {
               room.avatar_url
-                ? <Thumbnail source={{ uri: room.avatar_url }} />
-                : <Icon name="user-circle-o" size={35} />
+                ? <Thumbnail source={{ uri: 'Image URL' }} />
+                : <EvilIcon name="user" size={40} />
             }
           </Left>
           <Body style={styles.body}>

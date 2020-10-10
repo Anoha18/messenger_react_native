@@ -63,7 +63,7 @@ export default class User {
       and u.id != ${params.userId}
       and (lower(u.name) like '${_searchText}'
       or lower(u.lastname) like '${_searchText}'
-      or lower(u.login) like '${searchText}')
+      or lower(u.login) like '${_searchText}')
     `);
     if (error) return { error }
     return { userList: rows }

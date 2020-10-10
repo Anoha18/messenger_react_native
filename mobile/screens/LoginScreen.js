@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Alert, StatusBar } from 'react-native';
 import { Item, Input, Label, Button, Text } from 'native-base';
 import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
@@ -18,11 +18,11 @@ export default ({ navigation }) => {
   })
 
   const submit = async() => {
+    if (!login.trim() || !password.trim()) return Alert.alert('Не все поля заполнены')
     setLoading(true);
     const { error } = await dispatch(await authUser({ login, password }))
     if (error) {
       alert(error)
-      // setErrorResponse(error);
     }
     setLoading(false);
   }
@@ -34,6 +34,7 @@ export default ({ navigation }) => {
         flexGrow: 1,
         justifyContent: 'center',
       }}>
+        <StatusBar backgroundColor="#fff" barStyle="dark-content" />
         <View>
           <Text style={{ textAlign: 'center', textTransform: 'uppercase', fontSize: 30, fontWeight: 'bold' }}>Вход</Text>
         </View>

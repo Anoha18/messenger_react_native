@@ -15,7 +15,7 @@ const RegistrationScreen = ({ navigation, registerUser }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const submit = async () => {
-    if (!login || !name || !password || !confirmPassword) return Alert.alert('Не все поля заполнены')
+    if (!login.trim() || !name.trim() || !password.trim() || !confirmPassword.trim()) return Alert.alert('Не все поля заполнены')
     if (password !== confirmPassword) return Alert.alert('Пароли не совпадают')
     setLoading(true);
     const params = {

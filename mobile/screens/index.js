@@ -5,7 +5,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSelector, useDispatch } from 'react-redux';
 import IconAntd from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { RoomHeader, SearchUsersHeader } from '../headers';
 import { connectSocket, disconnectSocket } from '../store/actions/socket';
 
 import LoginScreen from './LoginScreen';
@@ -37,7 +36,6 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const SettingStack = createStackNavigator();
-const SearchUserStack = createStackNavigator();
 
 const HomeStackScreen = () => (
   <HomeStack.Navigator
@@ -185,9 +183,7 @@ export default ({ navigation }) => {
                   name="room"
                   component={RoomScreen}
                   options={{
-                    headerShown: true,
-                    headerTitle: 'Room',
-                    header: RoomHeader
+                    headerShown: false,
                   }}
                 /> 
               </Stack.Navigator>

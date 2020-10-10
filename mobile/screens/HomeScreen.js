@@ -26,7 +26,7 @@ const HomeScreen = ({
 }) => {
   return (
     <ScrollView style={styles.container}>
-      <StatusBar backgroundColor="#8E8E8F" />
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <RoomList
         roomList={mockRoomList()}
         onSelectRoom={(id) => navigation.push('room', { id })}

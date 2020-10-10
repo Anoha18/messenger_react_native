@@ -1,31 +1,53 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign';
+import { Text, View, StyleSheet, StatusBar } from 'react-native';
+import EvilIcon from 'react-native-vector-icons/EvilIcons';
+import {
+  Header,
+  Left,
+  Right,
+  Container,
+  Body,
+  Button,
+  Icon,
+  Title
+} from 'native-base';
 
-export default ({ navigation }) => {
+export default (props) => {
+  const { onPressBack, title } = props;
   return (
-    <View style={styles.container}>
-      <Icon onPress={() => navigation.goBack()} name="arrowleft" color="black" size={25} style={{ width: 24, height: 24 }} />
-      <Text>
-        133 This is Room Screen
-      </Text>
-      <Text></Text>
-    </View>
+    <Header
+      androidStatusBarColor="#fff"
+      style={styles.header}
+    >
+      <StatusBar barStyle="dark-content" />
+      <Left style={{ flex: 1 }}>
+        <Button
+          onPress={onPressBack}
+          color="black"
+          transparent
+        >
+          <Icon style={{ color: 'black' }} name="arrow-back" />
+        </Button>
+      </Left>
+      <Body style={{ flex: 0 }}>
+        <Title style={styles.headerTitle}>
+          {title}
+        </Title>
+      </Body>
+      <Right style={{ flex: 1 }}>
+          <EvilIcon name="user" size={40} />
+      </Right>
+    </Header>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff',
-    elevation: 4,
-    shadowColor: 'rgb(216, 216, 216)',
-    borderBottomColor: 'rgb(216, 216, 216)',
-    width: '100%',
-    height: 56,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
+  header: {
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingLeft: 15,
-    paddingRight: 15
+    backgroundColor: '#fff'
+  },
+  headerTitle: {
+    color: 'black'
   }
-})
+});

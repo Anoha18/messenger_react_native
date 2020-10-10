@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, StatusBar, Alert, ScrollView } from 'react-native';
+import { View, StyleSheet, Alert, ScrollView, StatusBar } from 'react-native';
 import {
   Container,
   Header,
@@ -14,7 +14,8 @@ import {
   Thumbnail,
   Left,
   Right,
-  Body
+  Body,
+  Title
 } from 'native-base';
 import { connect } from 'react-redux';
 import { searchUsers } from '../store/actions/user';
@@ -72,16 +73,21 @@ const SearchUsersScreen = (props) => {
 
   return (
     <Container>
-      <StatusBar backgroundColor="#324191" />
-      <Header searchBar rounded>
-        <Item>
+      <Header
+        androidStatusBarColor="#fff"
+        style={{ backgroundColor: '#fff' }}
+        searchBar
+        rounded
+      >
+        <Item style={{ backgroundColor: 'lightgray' }}>
           <Icon name="ios-search" />
-          <Input returnKeyType="search" onSubmitEditing={() => searchUser()} onChangeText={(text) => setSearchText(text)} placeholder="Поиск" />
+          <Input value={searchText} returnKeyType="search" onSubmitEditing={() => searchUser()} onChangeText={(text) => setSearchText(text)} placeholder="Поиск" />
           <Icon name="ios-people" />
         </Item>
         <Button onPress={() => searchUser()} transparent>
           <Text>Поиск</Text>
         </Button>
+        <StatusBar barStyle="dark-content" />
       </Header>
       { loading && <View style={styles.spinnerContainer}><Spinner /></View> }
       { (!loading && users.length && renderUserList()) || null }
