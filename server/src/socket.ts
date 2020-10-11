@@ -5,6 +5,7 @@ import { JWT } from './config';
 import { User } from './models';
 import { ConnectedUser, SocketUser, RequestEventPayload } from './interfaces/socket';
 import { UserInterface } from './interfaces/user';
+import handlers from './handlers';
 
 export default class {
   private io:Server;
@@ -90,6 +91,8 @@ export default class {
     console.log('HERE PAYLOAD: ', payload);
     console.log('HERE USERS: ', this.users);
     console.log('HERE SOCKET: ', socket);
+    if (!(handlers as any)[payload.action]) return;
+    (handlers as any)[payload.action](socket, payload.params);
   }
 
   public getSocket():Server { return this.io; }

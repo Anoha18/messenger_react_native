@@ -1,26 +1,76 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { GiftedChat, Send } from 'react-native-gifted-chat';
-import { useSelector } from 'react-redux';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import { RoomHeader } from '../headers';
 import { connect } from 'react-redux';
-import { getChatRoomByUserId } from '../store/actions/chat';
+import { getChatRoomByUserId, sendMessage, createChatRoom } from '../store/actions/chat';
+import { connectToChatRoom, sendNewMessage } from '../store/actions/socket';
+import { Toast, Thumbnail } from 'native-base';
 
 const RoomScreen = (props) => {
-  const { route, navigation, chatRoom, getChatRoomByUserId } = props;
+  const {
+    route,
+    navigation,
+    chatRoom,
+    getChatRoomByUserId,
+    user,
+    createChatRoom,
+    connectToChatRoom,
+    messageList
+  } = props;
   const { params } = route;
-  const { id, selectedUser } = params;
-  const [messageList, setMessageList] = useState([]);
-  const { user } = useSelector(state => state.user);
+  const { chatRoomId, selectedUser } = params;
 
-  useEffect(async () => {
-    console.log(selectedUser);
-    await getChatRoomByUserId(selectedUser.id)
+  useEffect(() => {
+    console.log(messageList);
+  }, [messageList])
+
+  useEffect(() => {
+    const loadRoom = async () => {
+      if (!chatRoomId) {
+        const { room, error } = await getChatRoomByUserId(selectedUser.id)
+        if (error) {
+          Toast.show({
+            text: error,
+            buttonText: 'OK',
+            duration: 10000,
+            type: 'danger'
+          })
+        }
+        
+        if (room) connectToChatRoom(room.id);
+      } else {
+        await connectToChatRoom(chatRoomId);
+      }
+    }
+    loadRoom();
   }, [])
 
-  const sendMessages = (messages) => {
-    setMessageList(oldMessageList => [messages[0], ...oldMessageList])
+  const sendMessage = async ([message]) => {
+    const _message = {
+      text: message.text,
+      room_id: null
+    }
+    if (!chatRoom) {
+      const { room, error } = await createChatRoom(selectedUser.id);
+      if (error) {
+        Toast.show({
+          text: error,
+          buttonText: 'OK',
+          duration: 5000,
+          type: 'danger'
+        })
+        return;
+      }
+
+      connectToChatRoom(room.id)
+      _message.room_id = room.id;
+    } else {
+      _message.room_id = chatRoom.id;
+    }
+
+    sendNewMessage(_message);
   }
 
   const renderChatEmpty = () => (
@@ -37,12 +87,21 @@ const RoomScreen = (props) => {
         onPressBack={() => navigation.goBack()}
       />
       <GiftedChat
-        onSend={sendMessages}
+        onSend={sendMessage}
         user={{
           name: `${user.name} ${user.lastname || ''}`,
-          _id: user.id
+          _id: user.id,
+          id: user.id
         }}
-        messages={messageList}
+        messages={messageList.map(message => ({
+          _id: message.id,
+          text: message.text,
+          createdAt: new Date(`${message.created_date} ${message.created_time}`),
+          user: {
+            _id: message.sender_id,
+            name: `${(message.sender && message.sender.name) || ''} ${(message.sender && message.sender.lastname) || ''}`
+          }
+        }))}
         placeholder="Введите сообщение"
         renderChatEmpty={renderChatEmpty}
         messagesContainerStyle={!messageList.length ? { transform: [{ scaleY: -1 }] } : null}
@@ -73,9 +132,14 @@ const styles = StyleSheet.create({
 
 export default connect(
   state => ({
-    chatRoom: state.chat.chatRoom
+    chatRoom: state.chat.chatRoom,
+    user: state.user.user,
+    messageList: state.chat.messageList
   }),
   {
-    getChatRoomByUserId
+    getChatRoomByUserId,
+    sendMessage,
+    createChatRoom,
+    connectToChatRoom,
   }
 ) (RoomScreen);

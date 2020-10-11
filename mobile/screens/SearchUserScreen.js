@@ -43,7 +43,7 @@ const SearchUsersScreen = (props) => {
     <ScrollView>
       <List>
         {users.map(user => (
-          <ListItem onPressOut={() => navigation.push('room', { selectedUser: user })} avatar>
+          <ListItem key={user.id} onPressOut={() => navigation.push('room', { selectedUser: user })} avatar>
             <Left>
               {user.avatar
                 ? <Thumbnail source={{ uri: 'Image URL' }} />

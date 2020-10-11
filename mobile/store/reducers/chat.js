@@ -1,6 +1,8 @@
 import {
   SET_CHAT_ROOM_LIST,
-  SET_CHAT_ROOM
+  SET_CHAT_ROOM,
+  SET_MESSAGE_LIST,
+  SET_MESSAGE,
 } from '../types';
 
 const handlers = {
@@ -12,6 +14,14 @@ const handlers = {
     ...state,
     chatRoom
   }),
+  [SET_MESSAGE_LIST]: (state, { messageList }) => ({
+    ...state,
+    messageList
+  }),
+  [SET_MESSAGE]: (state, { message }) => ({
+    ...state,
+    messageList: [message, ...state.messageList]
+  }),
   DEFAULT: (state) => ({
     ...state
   })
@@ -20,6 +30,7 @@ const handlers = {
 const initState = {
   chatRoomList: [],
   chatRoom: null,
+  messageList: []
 }
 
 export default (state = initState, action) => (handlers[action.type] && handlers[action.type](state, action)) || handlers.DEFAULT(state);
