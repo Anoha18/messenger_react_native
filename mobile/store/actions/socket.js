@@ -3,16 +3,18 @@ import {
   SET_CONNECT_SOCKET,
   SET_CHAT_ROOM_LIST,
   SET_MESSAGE_LIST,
-  SET_MESSAGE
+  SET_MESSAGE,
+  SET_SERVER_ERROR
 } from '../types';
 import { SERVER, SOCKET } from '../../config';
 
 export let socket;
 
 const actionHandlers = {
-  chatRoomList: (chatRoomList) => ({ type: SET_CHAT_ROOM_LIST, chatRoomList }),
   connectedToChatRoom: ({ messageList }) => ({ type: SET_MESSAGE_LIST, messageList }),
-  addedNewMessage: ({ message }) => ({ type: SET_MESSAGE, message })
+  addedNewMessage: ({ message }) => ({ type: SET_MESSAGE, message }),
+  updateChatRoomList: ({ chatRoomList }) => ({ type: SET_CHAT_ROOM_LIST, chatRoomList: chatRoomList || [] }),
+  serverError: ({ error }) => ({ type: SET_SERVER_ERROR, error })
 }
 
 export const connectSocket = () => (dispatch, getState) => {

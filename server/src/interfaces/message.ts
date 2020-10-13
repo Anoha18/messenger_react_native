@@ -7,6 +7,8 @@ export interface MessageById {
   created_time: string,
   updated_date: string,
   updated_time: string,
+  created_at: string,
+  updated_at: string,
   views: Array<{ user_id: number, id: number }>,
   sender_id: number,
   sender: {

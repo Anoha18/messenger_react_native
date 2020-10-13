@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import IconAntd from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { connectSocket, disconnectSocket } from '../store/actions/socket';
+import { Badge, Button } from 'native-base';
+import { Text, View } from 'react-native';
 
 import LoginScreen from './LoginScreen';
 import RegistrationSreen from './RegistrationSreen';
@@ -107,36 +109,65 @@ const LoginStackScreen = () => (
   </Stack.Navigator>
 )
 
-const MainTabNav = () => (
-  <Tab.Navigator
-    initialRouteName="home"
-    screenOptions={({ route }) => ({
-      tabBarIcon({ focused, color, size }) {
-        const tabInfo = TabsHome[route.name] || null;
-        if (!tabInfo) return;
-        if (tabInfo.iconProvider === 'Antd') {
-          return <IconAntd name={tabInfo.icon} size={size} color={color} />
-        } else if (tabInfo.iconProvider === 'MaterialCommunity') {
-          return <MaterialCommunityIcon name={tabInfo.icon} size={size} color={color} />
-        }
-      },
-      tabBarLabel: TabsHome[route.name].label,
-    })}
-  >
-    <Tab.Screen
-      name="search_user"
-      component={SearchUserScreen}
-    />
-    <Tab.Screen
-      name="home"
-      component={HomeStackScreen}
-    />
-    <Tab.Screen
-      name="settings"
-      component={SettingsStackScreen}
-    />
-  </Tab.Navigator>
-)
+const MainTabNav = () => {
+  const { chatRoomList } = useSelector((state) => state.chat);
+  const [countNewMessages, setCountNewMessages] = useState(0)
+  useEffect(() => {
+    if (chatRoomList.length) {
+      let count = 0;
+      chatRoomList.map(chatRoom => { count += +chatRoom.not_view_count});
+      setCountNewMessages(count);
+    }
+  }, [chatRoomList])
+
+  return (
+    <Tab.Navigator
+      initialRouteName="home"
+      screenOptions={({ route }) => ({
+        tabBarIcon({ focused, color, size }) {
+          const tabInfo = TabsHome[route.name] || null;
+          if (!tabInfo) return;
+          if (route.name === 'home') return (
+            <View>
+              {countNewMessages !== 0 ? (
+                <Badge style={{
+                  position: 'absolute',
+                  top: -5,
+                  right: -15,
+                  height: 25,
+                  width: 25,
+                  zIndex: 10
+                }}><Text numberOfLines={1} style={{ fontSize: 10, color: '#fff', fontWeight: 'bold' }}>{countNewMessages > 99 ? '99+' : countNewMessages}</Text></Badge>
+              ) : (
+                <></>
+              )}
+              <IconAntd name={tabInfo.icon} size={size} color={color} />
+            </View>
+          )
+          if (tabInfo.iconProvider === 'Antd') {
+            return <IconAntd name={tabInfo.icon} size={size} color={color} />
+          } else if (tabInfo.iconProvider === 'MaterialCommunity') {
+            return <MaterialCommunityIcon name={tabInfo.icon} size={size} color={color} />
+          }
+        },
+        tabBarLabel: TabsHome[route.name].label,
+      })}
+    >
+      <Tab.Screen
+        name="search_user"
+        component={SearchUserScreen}
+      />
+      <Tab.Screen
+        name="home"
+        component={HomeStackScreen}
+      />
+      <Tab.Screen
+        name="settings"
+        component={SettingsStackScreen}
+      />
+    </Tab.Navigator>
+  )
+}
 
 export default ({ navigation }) => {
   const dispatch = useDispatch();

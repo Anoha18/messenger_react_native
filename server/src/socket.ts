@@ -21,6 +21,7 @@ export default class {
 
   private connection():void {
     this.io.on('connection', (socket:SocketUser) => {
+      handlers.connection(socket);
       socket.on('disconnect', (reason) => this.disconnect(socket, reason));
       socket.on('request', (args) => this.request(socket, args))
     })

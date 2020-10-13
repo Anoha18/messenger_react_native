@@ -1,42 +1,34 @@
 import React from 'react';
-import { StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { StyleSheet, ScrollView, StatusBar, View, Text } from 'react-native';
 import RoomList from '../components/RoomList';
 import { connect } from 'react-redux';
 
-const random = (max, min) => Math.random() * (max - min) + min;
-
-const mockRoomList = () => {
-  const data = [];
-  for (let index = 0; index < 15; index++) {
-    data.push({
-      id: index + random(-100, 100),
-      name: 'Петр Петров ' + index,
-      last_message: 'Ла ллаа',
-      seen: random(-100, 100) > 0 ? true : false,
-      time: '10:12'
-    })
-  }
-
-  return data;
-}
-
-const HomeScreen = ({
-  navigation,
-  getChatRoomList
-}) => {
+const HomeScreen = (props) => {
+  const { navigation, chatRoomList, user } = props;
   return (
     <ScrollView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <RoomList
-        roomList={mockRoomList()}
-        onSelectRoom={(id) => navigation.push('room', { id })}
-      />
+      { chatRoomList.length ? (
+        <RoomList
+          roomList={chatRoomList}
+          onSelectRoom={(id) => navigation.push('room', { chatRoomId: id })}
+          user={user}
+        />
+      ) : (
+        <View style={styles.notRoomListContainer}>
+          <Text style={styles.notRoomListText}>Сообщений нет</Text>
+        </View>
+      )
+      }
     </ScrollView>
   )
 }
 
 export default connect(
-  null,
+  state => ({
+    chatRoomList: state.chat.chatRoomList,
+    user: state.user.user
+  }),
   {}
 )(HomeScreen)
 
@@ -45,5 +37,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     flex: 1,
     paddingTop: 10,
+  },
+  notRoomListContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notRoomListText: {
+    color: 'gray'
   }
 })

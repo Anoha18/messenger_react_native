@@ -7,6 +7,9 @@ import { connect } from 'react-redux';
 import { getChatRoomByUserId, sendMessage, createChatRoom } from '../store/actions/chat';
 import { connectToChatRoom, sendNewMessage } from '../store/actions/socket';
 import { Toast, Thumbnail } from 'native-base';
+import moment from 'moment';
+import ru from 'moment/locale/ru';
+moment.locale('ru')
 
 const RoomScreen = (props) => {
   const {
@@ -21,10 +24,6 @@ const RoomScreen = (props) => {
   } = props;
   const { params } = route;
   const { chatRoomId, selectedUser } = params;
-
-  useEffect(() => {
-    console.log(messageList);
-  }, [messageList])
 
   useEffect(() => {
     const loadRoom = async () => {
@@ -46,6 +45,10 @@ const RoomScreen = (props) => {
     }
     loadRoom();
   }, [])
+
+  const roomTitle = () => {
+    if (!chatRoomId)
+  }
 
   const sendMessage = async ([message]) => {
     const _message = {
@@ -83,7 +86,7 @@ const RoomScreen = (props) => {
     <>
       <StatusBar backgroundColor="#8E8E8F" />
       <RoomHeader
-        title={`${selectedUser.name} ${selectedUser.lastname || ''}`}
+        title={roomTitle()}
         onPressBack={() => navigation.goBack()}
       />
       <GiftedChat
@@ -96,15 +99,17 @@ const RoomScreen = (props) => {
         messages={messageList.map(message => ({
           _id: message.id,
           text: message.text,
-          createdAt: new Date(`${message.created_date} ${message.created_time}`),
+          createdAt: new Date(moment(message.created_at, 'DD-MM-YYYY HH:mm:ss')),
           user: {
             _id: message.sender_id,
             name: `${(message.sender && message.sender.name) || ''} ${(message.sender && message.sender.lastname) || ''}`
           }
         }))}
+        locale={'ru'}
         placeholder="Введите сообщение"
         renderChatEmpty={renderChatEmpty}
         messagesContainerStyle={!messageList.length ? { transform: [{ scaleY: -1 }] } : null}
+        inverted={true}
         renderSend={(props) => (
           <Send
             {...props}

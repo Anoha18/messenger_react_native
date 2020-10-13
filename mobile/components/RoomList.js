@@ -5,33 +5,42 @@ import EvilIcon from 'react-native-vector-icons/EvilIcons';
 
 export default ({
   roomList,
-  onSelectRoom
+  onSelectRoom,
+  user
 }) => {
+
+  const renderBadge = (room) => {
+    const { last_message, not_view_count } = room;
+    if (last_message.sender_id === user.id) return <></>
+  
+    const { views } = last_message;
+    if (!views.includes(user.id)) return (
+      <Badge style={{ backgroundColor: 'blue' }}>
+        <Text style={{ color: '#fff' }}>{not_view_count}</Text>
+      </Badge>
+    )
+
+    return <></>;
+  }
 
   return (
     <List>
       {roomList.map(room => (
-        <ListItem onPressOut={() => onSelectRoom(room.id)} avatar>
+        <ListItem key={room.id} onPressOut={() => onSelectRoom(room.id)} avatar>
           <Left>
             {
-              room.avatar_url
+              room.recipient.avatar
                 ? <Thumbnail source={{ uri: 'Image URL' }} />
                 : <EvilIcon name="user" size={40} />
             }
           </Left>
           <Body style={styles.body}>
-            <Text style={styles.itemTitle}>{room.name}</Text>
-            <Text style={styles.itemDescription}>{room.last_message}</Text>
+            <Text style={styles.itemTitle}>{(room.recipient && room.recipient.name) || ''} {(room.recipient && room.recipient.lastname) || ''}</Text>
+            <Text style={styles.itemDescription}>{(room.last_message && room.last_message.text) || ''}</Text>
           </Body>
           <Right>
-            <Text note>{room.time}</Text>
-            { room.seen ? (
-              <></>
-            ) : (
-              <Badge style={{ backgroundColor: 'blue' }}>
-                <Text style={{ color: '#fff' }}>12</Text>
-              </Badge>
-            )}
+            <Text style={{ marginBottom: 5 }} note>{room.last_message.created_time}</Text>
+            {renderBadge(room)}
           </Right>
         </ListItem>
       ))}
