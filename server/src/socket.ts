@@ -3,14 +3,14 @@ import jwt from 'jsonwebtoken';
 import MainServer from './server';
 import { JWT } from './config';
 import { User } from './models';
-import { ConnectedUser, SocketUser, RequestEventPayload } from './interfaces/socket';
+import { SocketUser, RequestEventPayload } from './interfaces/socket';
 import { UserInterface } from './interfaces/user';
 import handlers from './handlers';
 
-export default class {
+export default class SocketServer {
   private io:Server;
-  private users:Array<ConnectedUser> = [];
   private sockets:Array<SocketUser> = [];
+  private users: Map<number, Set<string>> = new Map();
 
   constructor(server:MainServer, options?: ServerOptions) {
     this.io = io(server.getServer(), options);
@@ -46,14 +46,13 @@ export default class {
         if (getUserError) { return next(new Error(`Authorization error: ${getUserError}`)) }
   
         if (!user) { return next(new Error(`Authorization error: User not found`)) }
-  
-        if (this.users.find(_user => _user.user_id === user.id)) {
-          this.users[this.users.findIndex(_user => _user.user_id === user.id)].socket_id = socket.id;
+
+        if (this.users.has(user.id)) {
+          this.users.get(user.id)?.add(socket.id);
         } else {
-          this.users.push({
-            user_id: user.id,
-            socket_id: socket.id
-          })
+          const set: Set<string> = new Set();
+          set.add(socket.id);
+          this.users.set(user.id, set);
         }
 
         if (!this.sockets.find(_socket => _socket.id === socket.id)) {
@@ -81,10 +80,16 @@ export default class {
 
   private disconnect(socket:SocketUser, reason:string) {
     const { handshake: { user } } = socket;
+    if (!user) return;
     console.log('Disconnect user reason: ', reason);
     console.log('Disconnected socket: ', socket.id);
     console.log('Disconnected user id: ', user && user.id);
-    this.users.splice(this.users.findIndex(_user => _user.user_id === (user && user.id)), 1);
+    if (!this.users.get(user.id)?.size || this.users.get(user.id)?.size === 1) {
+      this.users.delete(user.id)
+    } else {
+      this.users.get(user.id)?.delete(socket.id);
+    }
+
     this.sockets.splice(this.sockets.findIndex(_socket => _socket.id === socket.id));
   }
 
@@ -97,4 +102,5 @@ export default class {
   }
 
   public getSocket():Server { return this.io; }
+  public getUsers():Map<number, Set<string>> { return this.users }
 }

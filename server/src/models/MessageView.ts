@@ -1,7 +1,8 @@
-import { singleQuery } from '../db';
+import { multiQuery, singleQuery } from '../db';
 import {
   MessageView,
-  SaveMessageViewParams
+  SaveMessageViewParams,
+  MessageViewByRoomIdReturn
 } from '../interfaces/messageViews';
 
 export default class MessageViews {
@@ -32,5 +33,25 @@ export default class MessageViews {
     if (error) return { error }
 
     return { messageView: row }
+  }
+
+  static async viewMessageByRoomId(roomId: number, userId: number): Promise<{ viewedMessages?: Array<MessageViewByRoomIdReturn>, error?: string }> {
+    const { error, rows } = await multiQuery(`
+      insert into message_views(message_id, user_id)
+      select
+        m.id,
+        $2
+      from messages m
+      where m.room_id = $1
+      and not exists (
+        select 1 from message_views mv
+        where mv.message_id = m.id
+        and mv.user_id = $2
+      )
+      returning id, message_id, user_id
+    `, [roomId, userId]);
+    if (error) return { error }
+
+    return { viewedMessages: rows };
   }
 }

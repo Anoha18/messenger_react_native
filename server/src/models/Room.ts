@@ -124,7 +124,22 @@ export default class Room {
         to_char(r.created_at, 'DD.MM.YYYY') created_date,
         to_char(r.created_at, 'HH24:MI') created_time,
         to_char(r.updated_at, 'HH24:MI') updated_time,
-        to_char(r.updated_at, 'DD.MM.YYYY') updated_date
+        to_char(r.updated_at, 'DD.MM.YYYY') updated_date,
+        (
+          select json_agg(t) from (
+            select
+              u.id,
+              u.name,
+              u.lastname,
+              u.login
+            from users u
+            where exists (
+              select 1 from room_users ru
+              where ru.user_id = u.id
+              and ru.room_id = r.id
+            )
+          ) t
+        ) users
       from rooms r
       inner join room_types rt on rt.id = r.type_id
       where r.deleted = false

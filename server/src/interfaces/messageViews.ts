@@ -10,3 +10,9 @@ export interface SaveMessageViewParams {
   userId: number,
   messageId: number
 }
+
+export interface MessageViewByRoomIdReturn {
+  id: number,
+  message_id: number,
+  user_id: number,
+}

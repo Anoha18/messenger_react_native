@@ -6,6 +6,12 @@ import Socket from './socket';
 
 const app = new App();
 const server = new Server(SERVER.HOST, SERVER.PORT, app);
-new Socket(server, { path: SOCKET.PATH });
+const socketServer = new Socket(server, { path: SOCKET.PATH });
 middlewares(app);
 server.listen();
+
+export {
+  socketServer,
+  server,
+  app
+}

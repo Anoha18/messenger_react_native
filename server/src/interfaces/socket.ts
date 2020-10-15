@@ -9,11 +9,6 @@ interface SocketUser extends Socket {
   handshake: HandshakeUser
 }
 
-interface ConnectedUser {
-  user_id: number,
-  socket_id: string
-}
-
 interface RequestEventPayload {
   action: string,
   params?: any,
@@ -22,6 +17,5 @@ interface RequestEventPayload {
 export {
   HandshakeUser,
   SocketUser,
-  ConnectedUser,
   RequestEventPayload
 }

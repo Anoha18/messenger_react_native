@@ -1,6 +1,6 @@
 import { SocketUser } from '../interfaces/socket';
-import { Room } from '../models';
 import { multiQuery } from '../db';
+import updateChatRoomList from './updateChatRoomList';
 
 const joinSocketToRoom = async (socket: SocketUser) => {
   if (!socket.handshake.user) return;
@@ -32,15 +32,7 @@ const joinSocketToRoom = async (socket: SocketUser) => {
 export default async (socket:SocketUser) => {
   if (!socket.handshake.user) return;
 
-  const { roomList, error } = await Room.getRoomList(socket.handshake.user.id);
-  if (error) {
-    console.error(error);
-    return socket.emit('event', { action: 'serverError', params: { error }});
-  }
-
   await joinSocketToRoom(socket);
 
-  socket.emit('event', { action: 'updateChatRoomList', params: {
-    chatRoomList: roomList,
-  }});
+  await updateChatRoomList({ userId: socket.handshake.user.id });
 }

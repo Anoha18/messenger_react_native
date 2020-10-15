@@ -1,21 +1,12 @@
 import io from 'socket.io-client';
 import {
   SET_CONNECT_SOCKET,
-  SET_CHAT_ROOM_LIST,
-  SET_MESSAGE_LIST,
-  SET_MESSAGE,
-  SET_SERVER_ERROR
+  SET_CHAT_ROOM,
 } from '../types';
 import { SERVER, SOCKET } from '../../config';
+import * as actionHandlers from './socketActionHandlers';
 
 export let socket;
-
-const actionHandlers = {
-  connectedToChatRoom: ({ messageList }) => ({ type: SET_MESSAGE_LIST, messageList }),
-  addedNewMessage: ({ message }) => ({ type: SET_MESSAGE, message }),
-  updateChatRoomList: ({ chatRoomList }) => ({ type: SET_CHAT_ROOM_LIST, chatRoomList: chatRoomList || [] }),
-  serverError: ({ error }) => ({ type: SET_SERVER_ERROR, error })
-}
 
 export const connectSocket = () => (dispatch, getState) => {
   const { user } = getState();
@@ -57,8 +48,7 @@ export const connectSocket = () => (dispatch, getState) => {
     console.log('NEW EVENT: ', data);
     if (!data.action) return console.error('SOCKET EVENT WITHOUT ACTION');
     if (!actionHandlers[data.action]) return console.error('NOT HANDLER ACTION');
-    const dispatchParams = actionHandlers[data.action](data.params);
-    dispatch(dispatchParams);
+    dispatch(actionHandlers[data.action](data.params));
   })
 };
 
@@ -106,6 +96,20 @@ export const sendNewMessage = (message) => {
       action: 'newMessage',
       params: {
         ...message
+      }
+    })
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}
+
+export const viewMessages = (roomId) => {
+  try {
+    socket.emit('request', {
+      action: 'viewMessages',
+      params: {
+        roomId
       }
     })
   } catch (error) {

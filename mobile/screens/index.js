@@ -137,7 +137,7 @@ const MainTabNav = () => {
                   height: 25,
                   width: 25,
                   zIndex: 10
-                }}><Text numberOfLines={1} style={{ fontSize: 10, color: '#fff', fontWeight: 'bold' }}>{countNewMessages > 99 ? '99+' : countNewMessages}</Text></Badge>
+                }}><Text numberOfLines={1} style={{ fontSize: 10, color: '#fff', fontWeight: 'bold', textAlign: 'center' }}>{countNewMessages > 99 ? '99+' : countNewMessages}</Text></Badge>
               ) : (
                 <></>
               )}

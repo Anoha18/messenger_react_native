@@ -3,6 +3,7 @@ import {
   SET_CHAT_ROOM,
   SET_MESSAGE_LIST,
   SET_MESSAGE,
+  SET_VIEWED_MESSAGES,
 } from '../types';
 
 const handlers = {
@@ -21,6 +22,18 @@ const handlers = {
   [SET_MESSAGE]: (state, { message }) => ({
     ...state,
     messageList: [message, ...state.messageList]
+  }),
+  [SET_VIEWED_MESSAGES]: (state, { viewedMessages }) => ({
+    ...state,
+    messageList: state.messageList.map(message => {
+      const viewedMessage = viewedMessages.find(_viewedMessage => _viewedMessage.message_id === message.id)
+      if (viewedMessage) {
+        message.views = {
+          id: viewedMessage.id,
+          user_id: viewedMessage.user_id
+        }
+      }
+    })
   }),
   DEFAULT: (state) => ({
     ...state

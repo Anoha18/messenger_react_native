@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { GiftedChat, Send } from 'react-native-gifted-chat';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 import { RoomHeader } from '../headers';
 import { connect } from 'react-redux';
 import { getChatRoomByUserId, sendMessage, createChatRoom } from '../store/actions/chat';
-import { connectToChatRoom, sendNewMessage } from '../store/actions/socket';
+import { connectToChatRoom, sendNewMessage, viewMessages } from '../store/actions/socket';
 import { Toast, Thumbnail } from 'native-base';
 import moment from 'moment';
-import ru from 'moment/locale/ru';
-moment.locale('ru')
+import 'moment/locale/ru';
 
 const RoomScreen = (props) => {
   const {
@@ -20,7 +20,8 @@ const RoomScreen = (props) => {
     user,
     createChatRoom,
     connectToChatRoom,
-    messageList
+    messageList,
+    viewMessages
   } = props;
   const { params } = route;
   const { chatRoomId, selectedUser } = params;
@@ -46,8 +47,32 @@ const RoomScreen = (props) => {
     loadRoom();
   }, [])
 
+  useEffect(() => {
+    const checkView = () => {
+      let allView = true;
+      for (const message of messageList) {
+        if (!message.views.find(view => view.user_id === user.id)) {
+          allView = false;
+          break;
+        }
+      }
+      if (!allView) {
+        viewMessages(chatRoomId)
+      }
+    }
+
+    checkView();
+  }, [messageList])
+
   const roomTitle = () => {
-    if (!chatRoomId)
+    if (!chatRoom && selectedUser) {
+      return `${selectedUser.name} ${selectedUser.lastname || ''}`
+    } else if (chatRoom) {
+      const recipient = chatRoom.users.find(_user => _user.id !== user.id);
+      return `${recipient.name} ${recipient.lastname || ''}`
+    }
+
+    return ''
   }
 
   const sendMessage = async ([message]) => {
@@ -55,7 +80,7 @@ const RoomScreen = (props) => {
       text: message.text,
       room_id: null
     }
-    if (!chatRoom) {
+    if (!chatRoomId) {
       const { room, error } = await createChatRoom(selectedUser.id);
       if (error) {
         Toast.show({
@@ -70,7 +95,7 @@ const RoomScreen = (props) => {
       connectToChatRoom(room.id)
       _message.room_id = room.id;
     } else {
-      _message.room_id = chatRoom.id;
+      _message.room_id = chatRoomId;
     }
 
     sendNewMessage(_message);
@@ -103,7 +128,8 @@ const RoomScreen = (props) => {
           user: {
             _id: message.sender_id,
             name: `${(message.sender && message.sender.name) || ''} ${(message.sender && message.sender.lastname) || ''}`
-          }
+          },
+          views: message.views
         }))}
         locale={'ru'}
         placeholder="Введите сообщение"
@@ -122,6 +148,17 @@ const RoomScreen = (props) => {
             <IconAwesome size={23} name="send" color="dodgerblue" />
           </Send>
         )}
+        renderTicks={(message) => {
+          if (message.user._id !== user.id) {
+            return (
+              <Ionicon name={message.views.length > 1 ? 'checkmark-done' : 'checkmark' } color="blue" size={23} />
+            )
+          } else {
+            return (
+              <Ionicon name={message.views.length > 1 ? 'checkmark-done' : 'checkmark' } color="white" size={23} />
+            )
+          }
+        }}
       />
     </>
   )
@@ -146,5 +183,6 @@ export default connect(
     sendMessage,
     createChatRoom,
     connectToChatRoom,
+    viewMessages
   }
 ) (RoomScreen);

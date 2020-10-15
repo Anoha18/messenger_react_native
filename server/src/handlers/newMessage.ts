@@ -1,29 +1,12 @@
 import { SocketUser } from '../interfaces/socket';
 import { Message, MessageView, Room } from '../models';
+import { socketServer } from '../index';
+import updateChatRoomList from './updateChatRoomList';
 
 interface NewMessageParams {
   text: string,
   parent_id?: number,
   room_id: number
-}
-
-const sendToUsersRoom = async(socket: SocketUser) => {
-  if (!socket.handshake.user) return;
-
-  await Promise.all([Object.keys(socket.server.sockets.connected).forEach(async key => {
-    const _socket:SocketUser = socket.server.sockets.connected[key];
-    if (!_socket.handshake.user) return;
-
-    const { roomList, error: getRoomListError } = await Room.getRoomList(_socket.handshake.user.id);
-    if (getRoomListError) {
-      console.error(getRoomListError);
-      return _socket.emit('event', { action: 'serverError', params: { error: getRoomListError }});
-    }
-
-    _socket.emit('event', { action: 'updateChatRoomList', params: {
-      chatRoomList: roomList,
-    }});
-  })])
 }
 
 export default async (socket: SocketUser, params: NewMessageParams) => {
@@ -67,11 +50,11 @@ export default async (socket: SocketUser, params: NewMessageParams) => {
   const socketParams = {
     action: 'addedNewMessage',
     params: {
-      message
+      message,
+      roomId: params.room_id
     }
   }
-  socket.to(`chat-${params.room_id}`).emit('event', socketParams);
-  socket.emit('event', socketParams);
 
-  await sendToUsersRoom(socket);
+  socketServer.getSocket().to(`chat-${params.room_id}`).emit('event', socketParams);
+  await updateChatRoomList({ roomId: params.room_id })
 }
