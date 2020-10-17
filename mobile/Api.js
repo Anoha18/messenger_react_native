@@ -5,6 +5,7 @@ class Api {
   url = null;
   token = null;
   timeout = 3000;
+  refreshToken = null;
 
   constructor(url, path) {
     this.url = `${url || SERVER.URL}${path || SERVER.API_PATH}`;
@@ -14,21 +15,43 @@ class Api {
     return axios.get(`${SERVER.URL}/ping`, { timeout: this.timeout });
   }
 
+  /**
+   * @param {string} token 
+   */
   setToken(token) {
     this.token = token;
+  }
+
+  /**
+   * @param {string} refreshToken 
+   */
+  setRefreshToken(refreshToken) {
+    this.refreshToken = refreshToken;
+  }
+
+  // TODO: сделать метод обновления токена доступа
+  refresingToken() {
+
   }
 
   /**
    * @param {string} path 
    * @param {AxiosRequestConfig} params 
    */
-  get(path, params) {
-    return axios.get(`${this.url}${path}`, {
-      headers: {
-        Authorization: this.token ? `Bearer ${this.token}` : undefined,
-      },
-      ...params,
-    });
+  async get(path, params) {
+    try {
+      const result = await axios.get(`${this.url}${path}`, {
+        headers: {
+          Authorization: this.token ? `Bearer ${this.token}` : undefined,
+        },
+        ...params,
+      });
+    } catch (error) {
+      // TODO: Дописать обработчик ошибки 401
+      // в error лежит response, config, request
+      const { response } = error;
+      console.error('ERROR!!!!!!!!: ', error);
+    }
   }
 
   /**

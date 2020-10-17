@@ -94,9 +94,12 @@ export default class SocketServer {
   }
 
   private request(socket:SocketUser, payload:RequestEventPayload) {
-    console.log('HERE PAYLOAD: ', payload);
-    console.log('HERE USERS: ', this.users);
-    console.log('HERE SOCKET: ', socket);
+    console.log('\n\n-----------NEW SOCKET REQUEST-----------');
+    console.log('ACTION: ', payload.action);
+    console.log('PARAMS: ', payload.params);
+    console.log('USER: ', socket.handshake.user);
+    console.log('-----------------------------------------\n\n');
+
     if (!(handlers as any)[payload.action]) return;
     (handlers as any)[payload.action](socket, payload.params);
   }

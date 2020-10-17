@@ -5,8 +5,8 @@ import {
 } from '../types';
 import { SERVER } from '../../config';
 import axios from 'axios';
-// import { connectSocket, disconnectSocket } from './socket';
 import api from '../../Api';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export const authUser = (loginData) => async (dispatch) => {
   try {
@@ -21,8 +21,13 @@ export const authUser = (loginData) => async (dispatch) => {
     dispatch({ type: SET_USER, user });
     dispatch({ type: SET_ACCESS_TOKEN, accessToken });
     dispatch({ type: SET_REFRESH_TOKEN, refreshToken });
-    // dispatch(connectSocket());
+    await dispatch(await saveToAsyncStorageUserData({
+      id: user.id,
+      accessToken,
+      refreshToken
+    }));
     api.setToken(accessToken);
+    api.setRefreshToken(refreshToken);
   } catch (error) {
     console.error(error);
     return { error: error.message }
@@ -39,7 +44,6 @@ export const logoutUser = () => async(dispatch, getState) => {
     dispatch({ type: SET_USER, user: null });
     dispatch({ type: SET_ACCESS_TOKEN, accessToken: null });
     dispatch({ type: SET_REFRESH_TOKEN, refreshToken: null });
-    // dispatch(disconnectSocket());
   } catch (error) {
     console.error('ERROR LOGOUT: ', error);
   }
@@ -78,6 +82,31 @@ export const registerUser = (params) => async(dispatch) => {
       login: params.login,
       password: params.password
     }));
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}
+
+export const saveToAsyncStorageUserData = (userData) => async() => {
+  const { id, accessToken, refreshToken } = userData;
+  try {
+    await AsyncStorage.setItem('userId', id.toString());
+    await AsyncStorage.setItem('accessToken', accessToken);
+    await AsyncStorage.setItem('refreshToken', refreshToken);
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}
+
+export const autoLogin = () => async() => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    const userId = await AsyncStorage.getItem('userId');
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    api.setToken(accessToken);
+    api.setRefreshToken(refreshToken);
   } catch (error) {
     console.error(error);
     return { error: error.message }

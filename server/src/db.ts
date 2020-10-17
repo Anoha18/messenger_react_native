@@ -1,17 +1,12 @@
 import { Pool } from 'pg';
 import { DB } from './config';
 
-const logger = (messages:any) => {
-  console.log('PG POOL LOG: ', messages);
-}
-
 const pool:Pool = new Pool({
   database: DB.NAME,
   user: DB.USER,
   password: DB.PASSWORD,
   host: DB.HOST,
   port: DB.PORT,
-  log: logger
 });
 
 interface ReturnTestConnection {

@@ -29,7 +29,6 @@ export const connectSocket = () => (dispatch, getState) => {
       }
     }
   });
-  console.log('HERE SOCKET');
   socket.on('connect', () => {
     console.log('CONNECT SOCKET');
     dispatch({
@@ -46,8 +45,20 @@ export const connectSocket = () => (dispatch, getState) => {
   })
   socket.on('event', (data) => {
     console.log('NEW EVENT: ', data);
-    if (!data.action) return console.error('SOCKET EVENT WITHOUT ACTION');
-    if (!actionHandlers[data.action]) return console.error('NOT HANDLER ACTION');
+    if (!data.action) {
+      console.error('SOCKET EVENT WITHOUT ACTION');
+      return dispatch({
+        type: SET_SERVER_ERROR,
+        error: 'SOCKET EVENT WITHOUT ACTION'
+      })
+    }
+    if (!actionHandlers[data.action]) {
+      console.error('NOT HANDLER ACTION')
+      return dispatch({
+        type: SET_SERVER_ERROR,
+        error: 'NOT HANDLER ACTION'
+      })
+    };
     dispatch(actionHandlers[data.action](data.params));
   })
 };
@@ -112,6 +123,7 @@ export const viewMessages = (roomId) => {
         roomId
       }
     })
+    return { type: '' }
   } catch (error) {
     console.error(error);
     return { error: error.message }

@@ -49,15 +49,12 @@ const RoomScreen = (props) => {
 
   useEffect(() => {
     const checkView = () => {
-      let allView = true;
+      if (!messageList || !messageList.length) return;
+
       for (const message of messageList) {
         if (!message.views.find(view => view.user_id === user.id)) {
-          allView = false;
-          break;
+          return viewMessages(chatRoomId);
         }
-      }
-      if (!allView) {
-        viewMessages(chatRoomId)
       }
     }
 

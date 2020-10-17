@@ -11,7 +11,6 @@ export default ({
 
   const renderBadge = (room) => {
     const { last_message, not_view_count } = room;
-    console.log('HERE ROOM: ', room);
     if (last_message.sender_id === user.id) return <></>
     if (!+not_view_count) return <></>
   

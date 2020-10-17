@@ -26,13 +26,23 @@ const handlers = {
   [SET_VIEWED_MESSAGES]: (state, { viewedMessages }) => ({
     ...state,
     messageList: state.messageList.map(message => {
-      const viewedMessage = viewedMessages.find(_viewedMessage => _viewedMessage.message_id === message.id)
+      const viewedMessage = viewedMessages.find(_viewedMessage => +_viewedMessage.message_id === +message.id)
       if (viewedMessage) {
-        message.views = {
+        const { views } = message;
+        views.push({
           id: viewedMessage.id,
           user_id: viewedMessage.user_id
+        })
+        const _message = {
+          ...message,
+          ...{
+            views: views
+          }
         }
+        return _message;
       }
+
+      return message;
     })
   }),
   DEFAULT: (state) => ({

@@ -1,6 +1,7 @@
 import { SocketUser } from '../interfaces/socket';
 import { MessageView } from '../models';
 import { socketServer } from '../index';
+import updateChatRoomList from './updateChatRoomList';
 
 interface ViewMessagesParams {
   roomId: number,
@@ -20,4 +21,5 @@ export default async(socket: SocketUser, params: ViewMessagesParams) => {
   socketServer.getSocket().to(`chat-${roomId}`).emit('event', { action: 'viewedMessages', params: {
     viewedMessages
   }});
+  await updateChatRoomList({ roomId });
 }
