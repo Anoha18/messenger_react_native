@@ -1,5 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { SERVER } from './config';
+import store from './store';
+import { setUser, setAccessToken, setRefreshToken } from './store/actions/user';
 
 class Api {
   url = null;
@@ -30,8 +32,28 @@ class Api {
   }
 
   // TODO: сделать метод обновления токена доступа
-  refresingToken() {
+  async refresingToken() {
+    try {
+      const { data } = await axios.post(`${SERVER.URL}/auth/refresh_token`, {
+        refreshToken: this.refreshToken
+      });
+      const { result, error } = data;
+      if (error) {
+        console.error('REFRESH TOKEN ERROR: ', error);
+        store.dispatch(setUser(null));
+        store.dispatch(setAccessToken(null));
+        store.dispatch(setRefreshToken(null));
+        return { error }
+      }
 
+      const { accessToken, refreshToken } = result;
+      this.token = accessToken;
+      this.refreshToken = refreshToken;
+      return { result }
+    } catch (error) {
+      console.error('REFRESH TOKEN ERROR: ', error);
+      return { error: error.message };
+    }
   }
 
   /**
@@ -46,11 +68,18 @@ class Api {
         },
         ...params,
       });
+
+      return result;
     } catch (error) {
-      // TODO: Дописать обработчик ошибки 401
-      // в error лежит response, config, request
+      console.error('API METHOD GET ERROR: ', error);
       const { response } = error;
-      console.error('ERROR!!!!!!!!: ', error);
+      const { status } = response;
+      if (status !== 401) throw new Error(error.message);
+
+      const { error: refreshingTokenError } = await this.refresingToken();
+      if (refreshingTokenError) throw new Error(refreshingTokenError);
+
+      return this.get(path, params);
     }
   }
 

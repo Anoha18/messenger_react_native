@@ -112,3 +112,18 @@ export const autoLogin = () => async() => {
     return { error: error.message }
   }
 }
+
+export const setUser = (user) => ({
+  type: SET_USER,
+  user
+})
+
+export const setAccessToken = (accessToken) => ({
+  type: SET_ACCESS_TOKEN,
+  accessToken
+});
+
+export const setRefreshToken = (refreshToken) => ({
+  type: SET_REFRESH_TOKEN,
+  refreshToken
+});

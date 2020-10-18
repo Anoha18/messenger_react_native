@@ -6,11 +6,13 @@ import { UserInterface, UserRegisterData } from '../interfaces/user';
 import { JWT } from '../config';
 import { User } from '../models';
 
-const generateAccessJWT = (payload: any) => jwt
-  .sign(payload, JWT.ACCESS_JWT_SECRET, { expiresIn: JWT.ACCESS_JWT_LIFE });
+interface RefreshTokenBody {
+  refreshToken: string,
+}
 
-const generateRefreshJWT = (payload: any) => jwt
-  .sign(payload, JWT.REFRESH_JWT_SECRET, { expiresIn: JWT.REFRESH_JWT_LIFE });
+interface TokenPayload {
+  id: number
+}
 
 export default class AuthController extends BaseController {
   constructor() {
@@ -21,6 +23,7 @@ export default class AuthController extends BaseController {
   private initRoutes(): void {
     this.router.post('/login', this.login);
     this.router.post('/registration', this.registration);
+    this.router.post('/refresh_token', this.refreshToken);
   }
 
   private login(req: Request, res: Response, next: NextFunction) {
@@ -34,9 +37,9 @@ export default class AuthController extends BaseController {
 
       if (!user) { return res.json({ error: 'Логин или пароль неверный' }) }
 
-      const tokenPayload = { id: user.id };
-      const accessToken = generateAccessJWT(tokenPayload);
-      const refreshToken = generateRefreshJWT(tokenPayload);
+      const tokenPayload:TokenPayload = { id: user.id };
+      const accessToken = this.generateAccessJWT(tokenPayload);
+      const refreshToken = this.generateRefreshJWT(tokenPayload);
 
       res.json({ result: {
         accessToken,
@@ -55,5 +58,38 @@ export default class AuthController extends BaseController {
     const { user, error: getUserError } = await User.getUserById(userid);
     if (getUserError) return res.json({ error: getUserError });
     res.json({ result: user });
+  }
+
+  private async refreshToken(req: Request, res: Response) {
+    const body: RefreshTokenBody = req.body;
+    const { refreshToken } = body;
+    if (!refreshToken) return res.json({ error: 'Not found refresh token' });
+
+    const { tokenData, error } = this.decodedRefreshToken(refreshToken);
+    if (error) return res.json({ error });
+
+    const { id } = tokenData as TokenPayload;
+    const accessToken:string = this.generateAccessJWT(tokenData as TokenPayload);
+    const newRefreshToken:string = this.generateRefreshJWT(tokenData as TokenPayload);
+
+    res.status(200).json({ result: {
+      accessToken,
+      refreshToken: newRefreshToken,
+    }})
+  }
+
+  private generateAccessJWT = (payload: TokenPayload) => jwt
+    .sign(payload, JWT.ACCESS_JWT_SECRET, { expiresIn: JWT.ACCESS_JWT_LIFE });
+
+  private generateRefreshJWT = (payload: TokenPayload) => jwt
+    .sign(payload, JWT.REFRESH_JWT_SECRET, { expiresIn: JWT.REFRESH_JWT_LIFE });
+
+  private decodedRefreshToken (refreshToken: string) {
+    try {
+      const tokenData = jwt.verify(refreshToken, JWT.REFRESH_JWT_SECRET);
+      return { tokenData };
+    } catch (error) {
+      return { error: error.message };
+    }
   }
 }
