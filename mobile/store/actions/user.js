@@ -39,11 +39,17 @@ export const logoutUser = () => async(dispatch, getState) => {
   if (!user) return { error: 'Not found user' };
 
   try {
-    const { data } = await api.get('/logout');
+    const { data } = await api.get('/user/logout');
+    const { result } = data;
 
+    if (!result) { return }
+
+    await dispatch(await clearAsyncStorageUserData());
     dispatch({ type: SET_USER, user: null });
     dispatch({ type: SET_ACCESS_TOKEN, accessToken: null });
     dispatch({ type: SET_REFRESH_TOKEN, refreshToken: null });
+    api.setToken(null);
+    api.setRefreshToken(null);
   } catch (error) {
     console.error('ERROR LOGOUT: ', error);
   }
@@ -100,13 +106,52 @@ export const saveToAsyncStorageUserData = (userData) => async() => {
   }
 }
 
-export const autoLogin = () => async() => {
+export const clearAsyncStorageUserData = () => async() => {
+  try {
+    await AsyncStorage.removeItem('userId');
+    await AsyncStorage.removeItem('accessToken');
+    await AsyncStorage.removeItem('refreshToken');
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}
+
+export const autoLogin = () => async(dispatch) => {
   try {
     const accessToken = await AsyncStorage.getItem('accessToken');
     const userId = await AsyncStorage.getItem('userId');
     const refreshToken = await AsyncStorage.getItem('refreshToken');
+
+    dispatch(setAccessToken(accessToken));
+    dispatch(setRefreshToken(refreshToken));
     api.setToken(accessToken);
     api.setRefreshToken(refreshToken);
+    const { user, error } = await dispatch(await getUserById(userId));
+
+    if (error) {
+      dispatch(setUser(null));
+      dispatch(setAccessToken(null));
+      dispatch(setRefreshToken(null));
+      api.setToken(null);
+      api.setRefreshToken(null);
+      return { error }
+    }
+
+    dispatch(setUser(user));
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}
+
+export const getUserById = (userId) => async() => {
+  try {
+    const { data } = await api.get(`/user/${userId}`);
+    const { result, error } = data;
+    if (error) return { error }
+
+    return { user: result };
   } catch (error) {
     console.error(error);
     return { error: error.message }

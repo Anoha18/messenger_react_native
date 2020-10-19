@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
-import { GiftedChat, Send } from 'react-native-gifted-chat';
+import { GiftedChat, Send, Actions } from 'react-native-gifted-chat';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { RoomHeader } from '../headers';
 import { connect } from 'react-redux';
 import { getChatRoomByUserId, sendMessage, createChatRoom } from '../store/actions/chat';
 import { connectToChatRoom, sendNewMessage, viewMessages } from '../store/actions/socket';
-import { Toast, Thumbnail } from 'native-base';
+import { Toast, Thumbnail, ActionSheet } from 'native-base';
 import moment from 'moment';
 import 'moment/locale/ru';
+import ImagePicker from 'react-native-image-picker';
+
 
 const RoomScreen = (props) => {
   const {
@@ -25,6 +27,18 @@ const RoomScreen = (props) => {
   } = props;
   const { params } = route;
   const { chatRoomId, selectedUser } = params;
+
+  const pressSelectPhotoAction = () => {
+    ImagePicker.showImagePicker({
+      title: 'Выберите фото',
+      storageOptions: {
+        path: 'images',
+        skipBackup: true
+      },
+    }, (response) => {
+      console.log(response);
+    })
+  }
 
   useEffect(() => {
     const loadRoom = async () => {
@@ -104,6 +118,21 @@ const RoomScreen = (props) => {
     </View>
   )
 
+  const ActionSheetButton = [
+    { text: 'Фото', callback: pressSelectPhotoAction },
+    { text: 'Отмена', callback() {} }
+  ]
+
+  const showActionSheet = () => {
+    ActionSheet.show({
+      options: ActionSheetButton.map(btn => btn.text),
+      cancelButtonIndex: ActionSheetButton[ActionSheetButton.length]
+    }, buttonIndex => {
+      console.log(ActionSheetButton[buttonIndex]);
+      ActionSheetButton[buttonIndex].callback();
+    })
+  }
+
   return (
     <>
       <StatusBar backgroundColor="#8E8E8F" />
@@ -156,6 +185,7 @@ const RoomScreen = (props) => {
             )
           }
         }}
+        onPressActionButton={() => showActionSheet()}
       />
     </>
   )

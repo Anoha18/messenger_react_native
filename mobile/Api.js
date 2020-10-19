@@ -31,7 +31,6 @@ class Api {
     this.refreshToken = refreshToken;
   }
 
-  // TODO: сделать метод обновления токена доступа
   async refresingToken() {
     try {
       const { data } = await axios.post(`${SERVER.URL}/auth/refresh_token`, {
@@ -49,6 +48,8 @@ class Api {
       const { accessToken, refreshToken } = result;
       this.token = accessToken;
       this.refreshToken = refreshToken;
+      store.dispatch(setAccessToken(accessToken));
+      store.dispatch(setRefreshToken(refreshToken));
       return { result }
     } catch (error) {
       console.error('REFRESH TOKEN ERROR: ', error);
@@ -58,7 +59,8 @@ class Api {
 
   /**
    * @param {string} path 
-   * @param {AxiosRequestConfig} params 
+   * @param {AxiosRequestConfig} params
+   * @returns {Promise<import('axios').AxiosResponse>}
    */
   async get(path, params) {
     try {
@@ -71,10 +73,10 @@ class Api {
 
       return result;
     } catch (error) {
-      console.error('API METHOD GET ERROR: ', error);
+      console.log('API METHOD GET ERROR: ', error);
       const { response } = error;
       const { status } = response;
-      if (status !== 401) throw new Error(error.message);
+      if (+status !== 401) throw new Error(error.message);
 
       const { error: refreshingTokenError } = await this.refresingToken();
       if (refreshingTokenError) throw new Error(refreshingTokenError);
@@ -87,28 +89,56 @@ class Api {
    * @param {string} path
    * @param {any} data
    * @param {AxiosRequestConfig} params 
+   * @returns {Promise<import('axios').AxiosResponse>}
    */
-  post(path, data, params) {
-    return axios.post(`${this.url}${path}`, data, {
-      headers: {
-        Authorization: this.token ? `Bearer ${this.token}` : undefined
-      },
-      ...params
-    })
+  async post(path, data, params) {
+    try {
+      const result = await axios.post(`${this.url}${path}`, data, {
+        headers: {
+          Authorization: this.token ? `Bearer ${this.token}` : undefined
+        },
+        ...params
+      })
+      return result;
+    } catch (error) {
+      console.log('API METHOD POST ERROR: ', error);
+      const { response } = error;
+      const { status } = response;
+      if (+status !== 401) throw new Error(error.message);
+
+      const { error: refreshingTokenError } = await this.refresingToken();
+      if (refreshingTokenError) throw new Error(refreshingTokenError);
+
+      return this.post(path, data, params);
+    }
   }
 
   /**
    * @param {string} path
    * @param {any} data
    * @param {AxiosRequestConfig} params
+   * @returns {Promise<import('axios').AxiosResponse>}
    */
-  put(path, data, params) {
-    return axios.put(`${this.url}${path}`, data, {
-      headers: {
-        Authorization: this.token ? `Bearer ${this.token}` : undefined
-      },
-      ...params
-    })
+  async put(path, data, params) {
+    try {
+      const result = await axios.put(`${this.url}${path}`, data, {
+        headers: {
+          Authorization: this.token ? `Bearer ${this.token}` : undefined
+        },
+        ...params
+      })
+      return result;
+    } catch (error) {
+      console.log('API METHOD PUT ERROR: ', error);
+      const { response } = error;
+      const { status } = response;
+      if (+status !== 401) throw new Error(error.message);
+
+      const { error: refreshingTokenError } = await this.refresingToken();
+      if (refreshingTokenError) throw new Error(refreshingTokenError);
+
+      return this.put(path, data, params);
+    }
   }
 
   getAxios() {

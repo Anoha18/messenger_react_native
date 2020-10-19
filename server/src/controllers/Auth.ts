@@ -14,6 +14,21 @@ interface TokenPayload {
   id: number
 }
 
+const generateAccessJWT = (payload: TokenPayload) => jwt
+  .sign(payload, JWT.ACCESS_JWT_SECRET, { expiresIn: JWT.ACCESS_JWT_LIFE });
+
+const generateRefreshJWT = (payload: TokenPayload) => jwt
+  .sign(payload, JWT.REFRESH_JWT_SECRET, { expiresIn: JWT.REFRESH_JWT_LIFE });
+
+const decodedRefreshToken = (refreshToken: string) => {
+  try {
+    const tokenData = jwt.verify(refreshToken, JWT.REFRESH_JWT_SECRET);
+    return { tokenData };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
 export default class AuthController extends BaseController {
   constructor() {
     super();
@@ -38,14 +53,14 @@ export default class AuthController extends BaseController {
       if (!user) { return res.json({ error: 'Логин или пароль неверный' }) }
 
       const tokenPayload:TokenPayload = { id: user.id };
-      const accessToken = this.generateAccessJWT(tokenPayload);
-      const refreshToken = this.generateRefreshJWT(tokenPayload);
+      const accessToken = generateAccessJWT(tokenPayload);
+      const refreshToken = generateRefreshJWT(tokenPayload);
 
       res.json({ result: {
         accessToken,
         refreshToken,
         user
-      } });
+      }});
     }) (req, res, next)
   }
 
@@ -65,31 +80,16 @@ export default class AuthController extends BaseController {
     const { refreshToken } = body;
     if (!refreshToken) return res.json({ error: 'Not found refresh token' });
 
-    const { tokenData, error } = this.decodedRefreshToken(refreshToken);
+    const { tokenData, error } = decodedRefreshToken(refreshToken);
     if (error) return res.json({ error });
 
     const { id } = tokenData as TokenPayload;
-    const accessToken:string = this.generateAccessJWT(tokenData as TokenPayload);
-    const newRefreshToken:string = this.generateRefreshJWT(tokenData as TokenPayload);
+    const accessToken:string = generateAccessJWT({ id });
+    const newRefreshToken:string = generateRefreshJWT({ id });
 
     res.status(200).json({ result: {
       accessToken,
       refreshToken: newRefreshToken,
     }})
-  }
-
-  private generateAccessJWT = (payload: TokenPayload) => jwt
-    .sign(payload, JWT.ACCESS_JWT_SECRET, { expiresIn: JWT.ACCESS_JWT_LIFE });
-
-  private generateRefreshJWT = (payload: TokenPayload) => jwt
-    .sign(payload, JWT.REFRESH_JWT_SECRET, { expiresIn: JWT.REFRESH_JWT_LIFE });
-
-  private decodedRefreshToken (refreshToken: string) {
-    try {
-      const tokenData = jwt.verify(refreshToken, JWT.REFRESH_JWT_SECRET);
-      return { tokenData };
-    } catch (error) {
-      return { error: error.message };
-    }
   }
 }

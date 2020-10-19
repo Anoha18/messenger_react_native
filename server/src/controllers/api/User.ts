@@ -10,7 +10,9 @@ export default class UserController extends BaseController {
   }
 
   private initRoutes():void {
-    this.router.get('/by', this.getUserBy)
+    this.router.get('/by', this.getUserBy);
+    this.router.get('/logout', this.logout);
+    this.router.get('/:id', this.getUserById);
   }
 
   private async getUserBy(req: Request, res: Response):Promise<void> {
@@ -23,5 +25,19 @@ export default class UserController extends BaseController {
     })
     if (error) res.json({ error });
     else res.json({ result: userList });
+  }
+
+  private async getUserById(req: Request, res: Response) {
+    const { id } = (req.params as any) as { id: number };
+    if (!id) return res.json({ error: 'User id not found' });
+
+    const { user, error } = await User.getUserById(id);
+    if (error) return res.json({ error });
+
+    res.json({ result: user });
+  }
+
+  private async logout(req: Request, res: Response) {
+    res.status(200).json({ result: true });
   }
 }

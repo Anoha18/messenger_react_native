@@ -10,6 +10,7 @@ export let socket;
 
 export const connectSocket = () => (dispatch, getState) => {
   const { user } = getState();
+  console.log(user);
   if (!user) return { error: 'Not found user' }
 
   const { accessToken } = user;
