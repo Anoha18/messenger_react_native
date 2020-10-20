@@ -2,10 +2,12 @@ import api from '../../Api';
 
 export const uploadFile = (file) => async() => {
   try {
-    console.log('HERE FILE: ', file);
-    const { data } = await api.post('/file/upload', file, {
+    const formData = await new FormData();
+    await formData.append('file', file);
+    const { data } = await api.post('/file/upload', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
       }
     });
     console.log(data);

@@ -26,9 +26,12 @@ const getClientIp = (req: Request, res: Response, next: NextFunction) => {
 export default (app: App):void => {
   app.middlewares([
     bodyParser.urlencoded({
+      limit: '50mb',
       extended: true
     }),
-    bodyParser.json(),
+    bodyParser.json({
+      limit: '50mb',
+    }),
     cookieParser(),
     passport.initialize(),
     { path: '*', func: getClientIp }

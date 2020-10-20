@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import path from 'path';
 import { testConnection } from './db';
 
 interface AppRoute {
@@ -11,6 +12,7 @@ export default class App {
 
   constructor() {
     this.app = express();
+    this.sharedUploads();
     this.testConnectionToDb();
   }
 
@@ -19,6 +21,11 @@ export default class App {
     if (error) {
       throw new Error(error);
     }
+  }
+
+  private sharedUploads() {
+    const pathUploads = path.join(__dirname + '../../uploads');
+    this.app.use('/uploads', express.static(pathUploads));
   }
 
   public middlewares(middlewares: Array<any>):void {

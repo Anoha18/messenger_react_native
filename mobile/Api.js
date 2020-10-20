@@ -31,6 +31,13 @@ class Api {
     this.refreshToken = refreshToken;
   }
 
+  /**
+   * @returns {string}
+   */
+  getAccessToken() {
+    return this.token
+  }
+
   async refresingToken() {
     try {
       const { data } = await axios.post(`${SERVER.URL}/auth/refresh_token`, {
@@ -92,17 +99,17 @@ class Api {
    * @returns {Promise<import('axios').AxiosResponse>}
    */
   async post(path, data, params) {
-    const headers = {
-      ...params.headers,
-      ...{
-        Authorization: this.token ? `Bearer ${this.token}` : undefined,
-      }
-    }
-    console.log('HEADERS: ', headers);
     try {
       const result = await axios.post(`${this.url}${path}`, data, {
         ...params,
-        headers,
+        ...{
+          headers: {
+            ...params.headers,
+            ...{
+              Authorization: this.token ? `Bearer ${this.token}` : undefined,
+            }
+          }
+        }
       })
       return result;
     } catch (error) {
@@ -147,6 +154,9 @@ class Api {
     }
   }
 
+  /**
+   * @returns {import('axios').AxiosStatic}
+   */
   getAxios() {
     return axios;
   }

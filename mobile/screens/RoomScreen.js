@@ -100,15 +100,12 @@ const RoomScreen = (props) => {
   }
 
   const sendFile = async (file) => {
-    const fileData = new FormData();
-    fileData.append('name', 'file');
-    fileData.append('file', {
+    await uploadFile({
       uri: file.uri,
       type: file.type,
       name: file.fileName,
       data: file.data
-    })
-    await uploadFile(fileData);
+    });
   }
 
   const sendMessage = async ([message]) => {
