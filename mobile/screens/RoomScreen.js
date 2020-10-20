@@ -7,10 +7,12 @@ import { RoomHeader } from '../headers';
 import { connect } from 'react-redux';
 import { getChatRoomByUserId, sendMessage, createChatRoom } from '../store/actions/chat';
 import { connectToChatRoom, sendNewMessage, viewMessages } from '../store/actions/socket';
+import { uploadFile } from '../store/actions/file';
 import { Toast, Thumbnail, ActionSheet } from 'native-base';
 import moment from 'moment';
 import 'moment/locale/ru';
 import ImagePicker from 'react-native-image-picker';
+import RoomImageViewer from '../components/RoomImageViewer';
 
 
 const RoomScreen = (props) => {
@@ -23,10 +25,12 @@ const RoomScreen = (props) => {
     createChatRoom,
     connectToChatRoom,
     messageList,
-    viewMessages
+    viewMessages,
+    uploadFile,
   } = props;
   const { params } = route;
   const { chatRoomId, selectedUser } = params;
+  const [image, setImage] = useState(null);
 
   const pressSelectPhotoAction = () => {
     ImagePicker.showImagePicker({
@@ -36,7 +40,16 @@ const RoomScreen = (props) => {
         skipBackup: true
       },
     }, (response) => {
+      if (response.didCancel) {
+        return console.log('User cancelled image picker');
+      } else if (response.error) {
+        return console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        return console.log('User tapped custom button: ', response.customButton);
+      }
+
       console.log(response);
+      setImage(response);
     })
   }
 
@@ -86,7 +99,23 @@ const RoomScreen = (props) => {
     return ''
   }
 
+  const sendFile = async (file) => {
+    const fileData = new FormData();
+    fileData.append('name', 'file');
+    fileData.append('file', {
+      uri: file.uri,
+      type: file.type,
+      name: file.fileName,
+      data: file.data
+    })
+    await uploadFile(fileData);
+  }
+
   const sendMessage = async ([message]) => {
+    if (message.image) {
+      return sendFile(message.image);
+    }
+
     const _message = {
       text: message.text,
       room_id: null
@@ -187,6 +216,7 @@ const RoomScreen = (props) => {
         }}
         onPressActionButton={() => showActionSheet()}
       />
+      {image && <RoomImageViewer onSend={sendMessage} cancelView={() => setImage(null)} image={image} />}
     </>
   )
 }
@@ -196,7 +226,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 })
 
 export default connect(
@@ -210,6 +240,7 @@ export default connect(
     sendMessage,
     createChatRoom,
     connectToChatRoom,
-    viewMessages
+    viewMessages,
+    uploadFile,
   }
 ) (RoomScreen);

@@ -92,16 +92,22 @@ class Api {
    * @returns {Promise<import('axios').AxiosResponse>}
    */
   async post(path, data, params) {
+    const headers = {
+      ...params.headers,
+      ...{
+        Authorization: this.token ? `Bearer ${this.token}` : undefined,
+      }
+    }
+    console.log('HEADERS: ', headers);
     try {
       const result = await axios.post(`${this.url}${path}`, data, {
-        headers: {
-          Authorization: this.token ? `Bearer ${this.token}` : undefined
-        },
-        ...params
+        ...params,
+        headers,
       })
       return result;
     } catch (error) {
       console.log('API METHOD POST ERROR: ', error);
+      console.log('QUERY CONFIG: ', error.config || '-');
       const { response } = error;
       const { status } = response;
       if (+status !== 401) throw new Error(error.message);
