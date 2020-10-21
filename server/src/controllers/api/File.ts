@@ -3,6 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import BaseController from '../BaseController';
 import { Request, Response } from 'express';
+import { File } from '../../models';
+import { UserInterface } from '../../interfaces/user';
 
 export default class FileController extends BaseController {
   private uploadPath = path.join(__dirname + '../../../../uploads');
@@ -36,9 +38,21 @@ export default class FileController extends BaseController {
     fs.mkdirSync(this.uploadPath);
   }
 
-  private uploadFile(req: Request, res: Response) {
-    console.log(req);
-    console.log(req.file);
-    res.json({ result: true });
+  private async uploadFile(req: Request, res: Response) {
+    const { file, user } = req;
+    if (!user) return res.json({ error: 'User not found' });
+
+
+    const { file: savedFile, error } = await File.saveFile({
+      file_name: file.filename,
+      file_path: `/uploads/${file.filename}`,
+      mime_type: file.mimetype,
+      creator_id: (user as UserInterface).id,
+      type: (file.mimetype.split('/'))[0]
+    });
+
+    if (error) return res.json({ error });
+
+    res.json({ result: savedFile });
   }
 }

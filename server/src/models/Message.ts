@@ -39,7 +39,40 @@ export default class Message {
             from users u
             where u.id = m.sender_id
           ) t
-        ) as sender
+        ) as sender,
+        (
+          select row_to_json(t) from (
+            select
+              f.id,
+              f.file_path,
+              f.file_name,
+              f.mime_type,
+              f.type,
+              f.creator_id,
+              to_char(f.created_at, 'DD.MM.YYYY') created_date,
+              to_char(f.created_at, 'HH24:MI') created_time,
+              (
+                select row_to_json(t) from (
+                  select
+                    u.id,
+                    u.name,
+                    u.lastname,
+                    u.login
+                  from users u
+                  where u.id = f.creator_id
+                  and u.deleted = false
+                ) t
+              ) creator
+            from files f
+            where exists (
+              select 1 from message_files mf
+              where mf.message_id = m.id
+              and mf.file_id = f.id
+            )
+            and f.deleted = false
+            limit 1
+          ) t
+        ) file
       from messages m
       where m.room_id = ${roomId}
       and m.deleted = false
@@ -85,7 +118,40 @@ export default class Message {
             from users u
             where u.id = m.sender_id
           ) t
-        ) as sender
+        ) as sender,
+        (
+          select row_to_json(t) from (
+            select
+              f.id,
+              f.file_path,
+              f.file_name,
+              f.mime_type,
+              f.type,
+              f.creator_id,
+              to_char(f.created_at, 'DD.MM.YYYY') created_date,
+              to_char(f.created_at, 'HH24:MI') created_time,
+              (
+                select row_to_json(t) from (
+                  select
+                    u.id,
+                    u.name,
+                    u.lastname,
+                    u.login
+                  from users u
+                  where u.id = f.creator_id
+                  and u.deleted = false
+                ) t
+              ) creator
+            from files f
+            where exists (
+              select 1 from message_files mf
+              where mf.message_id = m.id
+              and mf.file_id = f.id
+            )
+            and f.deleted = false
+            limit 1
+          ) t
+        ) file
       from messages m
       where m.id = ${messageId}
       and m.deleted = false

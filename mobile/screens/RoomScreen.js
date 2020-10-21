@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, PermissionsAndroid } from 'react-native';
 import { GiftedChat, Send, Actions } from 'react-native-gifted-chat';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -7,13 +7,12 @@ import { RoomHeader } from '../headers';
 import { connect } from 'react-redux';
 import { getChatRoomByUserId, sendMessage, createChatRoom } from '../store/actions/chat';
 import { connectToChatRoom, sendNewMessage, viewMessages } from '../store/actions/socket';
-import { uploadFile } from '../store/actions/file';
 import { Toast, Thumbnail, ActionSheet } from 'native-base';
 import moment from 'moment';
 import 'moment/locale/ru';
 import ImagePicker from 'react-native-image-picker';
 import RoomImageViewer from '../components/RoomImageViewer';
-
+import { SERVER } from '../config';
 
 const RoomScreen = (props) => {
   const {
@@ -26,11 +25,11 @@ const RoomScreen = (props) => {
     connectToChatRoom,
     messageList,
     viewMessages,
-    uploadFile,
   } = props;
   const { params } = route;
   const { chatRoomId, selectedUser } = params;
   const [image, setImage] = useState(null);
+  const [text, setText] = useState('');
 
   const pressSelectPhotoAction = () => {
     ImagePicker.showImagePicker({
@@ -99,22 +98,10 @@ const RoomScreen = (props) => {
     return ''
   }
 
-  const sendFile = async (file) => {
-    await uploadFile({
-      uri: file.uri,
-      type: file.type,
-      name: file.fileName,
-      data: file.data
-    });
-  }
-
   const sendMessage = async ([message]) => {
-    if (message.image) {
-      return sendFile(message.image);
-    }
-
     const _message = {
       text: message.text,
+      file_id: message.file_id || undefined,
       room_id: null
     }
     if (!chatRoomId) {
@@ -136,6 +123,8 @@ const RoomScreen = (props) => {
     }
 
     sendNewMessage(_message);
+    setText('');
+    setImage(null);
   }
 
   const renderChatEmpty = () => (
@@ -177,6 +166,7 @@ const RoomScreen = (props) => {
           _id: message.id,
           text: message.text,
           createdAt: new Date(moment(message.created_at, 'DD-MM-YYYY HH:mm:ss')),
+          image: (message.file && message.file.file_path && `${SERVER.URL}${message.file.file_path}`) || undefined,
           user: {
             _id: message.sender_id,
             name: `${(message.sender && message.sender.name) || ''} ${(message.sender && message.sender.lastname) || ''}`
@@ -188,6 +178,7 @@ const RoomScreen = (props) => {
         renderChatEmpty={renderChatEmpty}
         messagesContainerStyle={!messageList.length ? { transform: [{ scaleY: -1 }] } : null}
         inverted={true}
+        onInputTextChanged={(text) => setText(text)}
         renderSend={(props) => (
           <Send
             {...props}
@@ -213,7 +204,7 @@ const RoomScreen = (props) => {
         }}
         onPressActionButton={() => showActionSheet()}
       />
-      {image && <RoomImageViewer onSend={sendMessage} cancelView={() => setImage(null)} image={image} />}
+      {image && <RoomImageViewer text={text} onSend={sendMessage} cancelView={() => setImage(null)} image={image} />}
     </>
   )
 }
@@ -238,6 +229,5 @@ export default connect(
     createChatRoom,
     connectToChatRoom,
     viewMessages,
-    uploadFile,
   }
 ) (RoomScreen);

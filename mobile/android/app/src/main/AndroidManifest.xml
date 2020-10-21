@@ -11,7 +11,8 @@
       android:icon="@mipmap/messanger"
       android:roundIcon="@mipmap/messanger"
       android:allowBackup="false"
-      android:theme="@style/AppTheme">
+      android:theme="@style/AppTheme"
+      android:requestLegacyExternalStorage = "true">
 
         <activity
             android:name="com.mobile.SplashActivity"

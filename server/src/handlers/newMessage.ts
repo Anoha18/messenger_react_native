@@ -1,12 +1,17 @@
 import { SocketUser } from '../interfaces/socket';
-import { Message, MessageView, Room } from '../models';
+import { Message, MessageView, File } from '../models';
 import { socketServer } from '../index';
 import updateChatRoomList from './updateChatRoomList';
 
 interface NewMessageParams {
   text: string,
   parent_id?: number,
-  room_id: number
+  room_id: number,
+  file_id?: number,
+}
+
+const saveFile = async(messageId: number, fileId: number) => {
+  
 }
 
 export default async (socket: SocketUser, params: NewMessageParams) => {
@@ -45,6 +50,16 @@ export default async (socket: SocketUser, params: NewMessageParams) => {
       user_id: messageView.user_id,
       id: messageView.id
     }]
+  }
+
+  if (params.file_id) {
+    const { error: saveFileError } = await File.appendFileToMessage(message.id, params.file_id);
+    if (saveFileError) {
+      console.error(saveFileError);
+      socket.emit('event', { action: 'serverError', params: { error: saveFileError }});
+    } else {
+      message.file = (await File.getFileById(params.file_id)).file;
+    }
   }
 
   const socketParams = {

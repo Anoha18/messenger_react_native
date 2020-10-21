@@ -8,6 +8,7 @@ export interface SaveFileParams {
 }
 
 export interface FileById {
+  id: number,
   file_name: string,
   file_path: string,
   mime_type: string,
@@ -15,7 +16,7 @@ export interface FileById {
   creator_id: number,
   created_date: string,
   created_time: string,
-  creator: {
+  creator?: {
     id: number,
     name: string,
     lastname: string,

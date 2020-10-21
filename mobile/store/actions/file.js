@@ -2,8 +2,8 @@ import api from '../../Api';
 
 export const uploadFile = (file) => async() => {
   try {
-    const formData = await new FormData();
-    await formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file);
     const { data } = await api.post('/file/upload', formData, {
       headers: {
         Accept: 'application/json',
@@ -11,7 +11,10 @@ export const uploadFile = (file) => async() => {
       }
     });
     console.log(data);
-    return { data };
+    const { result, error } = data;
+    if (error) return { error }
+
+    return { file: result };
   } catch (error) {
     console.error(error);
     return { error: error.message }

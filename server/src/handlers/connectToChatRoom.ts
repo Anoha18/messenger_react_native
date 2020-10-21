@@ -10,11 +10,15 @@ export default async (socket:SocketUser, params: ConnectToChatRoomParams) => {
   socket.join(`chat-${params.roomId}`);
   const { user } = socket.handshake;
   if (user) {
-    const { error } = await MessageView.viewMessageByRoomId(params.roomId, user.id);
+    const { viewedMessages, error } = await MessageView.viewMessageByRoomId(params.roomId, user.id);
     if (error) {
       console.error(error);
       socket.emit('event', { action: 'serverError', params: { error }});
     }
+
+    socket.to(`chat-${params.roomId}`).emit('event', { action: 'viewedMessages', params: {
+      viewedMessages
+    }});
   }
   const { messageList, error } = await Message.getMessageListByRoomId({ roomId: params.roomId });
   const { room, error: getRoomByIdError } = await Room.getRoomById(params.roomId);

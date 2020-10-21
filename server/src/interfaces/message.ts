@@ -1,3 +1,5 @@
+import { FileById } from './file';
+
 export interface MessageById {
   id: number,
   text: string,
@@ -16,7 +18,8 @@ export interface MessageById {
     name: string,
     lastname: string,
     login: string
-  }
+  },
+  file?: FileById
 }
 
 export interface MessageByRoomIdParams {

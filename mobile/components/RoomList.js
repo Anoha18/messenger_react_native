@@ -37,7 +37,9 @@ export default ({
           </Left>
           <Body style={styles.body}>
             <Text style={styles.itemTitle}>{(room.recipient && room.recipient.name) || ''} {(room.recipient && room.recipient.lastname) || ''}</Text>
-            <Text style={styles.itemDescription}>{(room.last_message && room.last_message.text) || ''}</Text>
+            <Text style={styles.itemDescription}>
+              {(room.last_message.file && ((room.last_message.text && 'Фотография, ') || 'Фотография')) || ''}
+              {(room.last_message && room.last_message.text) || ''}</Text>
           </Body>
           <Right>
             <Text style={{ marginBottom: 5 }} note>{room.last_message.created_time}</Text>

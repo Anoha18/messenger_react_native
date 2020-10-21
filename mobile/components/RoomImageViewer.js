@@ -1,16 +1,38 @@
 import React, { useState } from 'react';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { StyleSheet, View, Modal, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Modal, Text, TouchableOpacity, Alert } from 'react-native';
 import { Item, Input } from 'native-base';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
+import { uploadFile } from '../store/actions/file';
+import { connect } from 'react-redux';
 
-export default (props) => {
+const RoomImageViewer = (props) => {
   const {
     onSend,
     cancelView,
-    image
+    image,
+    uploadFile,
   } = props;
-  const [text, setText] = useState('');
+  const [text, setText] = useState(props.text || '');
+
+  const sendFile = async (file) => {
+    const { file: savedFile, error } = await uploadFile({
+      uri: file.uri,
+      type: file.type,
+      name: file.fileName,
+      data: file.data,
+    });
+
+    if (error) {
+      return Alert.alert('Ошибка', error)
+    }
+
+    const message = {
+      text,
+      file_id: savedFile.id
+    }
+    onSend([ message ])
+  }
 
   return (
     <Modal style={styles.modalContainer}>
@@ -32,8 +54,8 @@ export default (props) => {
         }}
         regular
       >
-        <Input onChangeText={(text) => setText(text)} placeholder='Введите сообщение' />
-        <IconAwesome onPress={() => onSend([{ text, image }])} size={23} name="send" color="dodgerblue" />
+        <Input value={text} onChangeText={(text) => setText(text)} placeholder='Введите сообщение' />
+        <IconAwesome onPress={() => sendFile(image)} size={23} name="send" color="dodgerblue" />
       </Item>
     </Modal>
   )
@@ -59,3 +81,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   }
 });
+
+export default connect(
+  null,
+  {
+    uploadFile
+  }
+) (RoomImageViewer);
