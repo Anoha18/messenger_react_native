@@ -2,7 +2,8 @@ import { singleQuery, multiQuery } from '../db';
 import {
   UserInterface,
   SearchUserParam,
-  UserRegisterData
+  UserRegisterData,
+  UserUpdateParams
 } from '../interfaces/user';
 
 export default class User {
@@ -16,6 +17,19 @@ export default class User {
     `to_char(u.created_at, 'HH24:MI') created_time`,
     `to_char(u.updated_at, 'HH24:MI') updated_time`,
     `to_char(u.updated_at, 'DD.MM.YYYY') updated_date`,
+    `(
+      select row_to_json (t) from (
+        select
+          ua.id,
+          ua.file_id,
+          f.file_path
+        from user_avatar ua
+        inner join file f on f.id = ua.file_id
+        where ua.user_id = u.id
+        order by id desc
+        limit 1
+      ) t
+    ) avatar`
   ];
 
   static async authUser(login:string, password: string):Promise<{ user?: UserInterface, error?: string }> {
@@ -78,5 +92,19 @@ export default class User {
     if (error) return { error }
 
     return { userid: row?.id }
+  }
+
+  static async updateUserById(userId: number, params: UserUpdateParams): Promise<{ user?: UserInterface, error?: string }> {
+    const { error } = await singleQuery(`
+      update users set updated_at = now()
+      and name = $2
+      ${(params.lastname && 'lastname = $3') || ''}
+      where id = $1
+      returning id 
+    `, [userId, params.name, params.lastname]);
+
+    if (error) return { error }
+
+    return User.getUserById(userId);
   }
 }

@@ -15,10 +15,20 @@ export interface UserInterface {
   created_time?: string,
   updated_date?: string,
   updated_time?: string,
+  avatar?: {
+    id: number,
+    file_id: number,
+    file_path: string
+  }
 }
 
 export interface UserRegisterData {
   name: string,
   login: string,
   password: string
+}
+
+export interface UserUpdateParams {
+  name: string,
+  lastname?: string | null | undefined,
 }

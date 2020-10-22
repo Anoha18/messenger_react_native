@@ -53,4 +53,27 @@ export default class File {
 
     return { error }
   }
+
+  static async saveUserAvatar(userId: number, fileId: number): Promise<{ error?: string }> {
+    const { row } = await singleQuery(`
+      select id from user_avatar ua
+      where ua.user_id = $1
+    `, [userId]);
+
+    if (row.id) {
+      const { error: updatedError } = await singleQuery(`
+        update user_avatar set file_id = $2
+        where user_id = $1
+      `, [userId, fileId])
+
+      return { error: updatedError };
+    }
+
+    const { error } = await singleQuery(`
+      insert into user_avatar(user_id, file_id)
+      values ($1, $2)
+    `, [userId, fileId]);
+
+    return { error };
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, StatusBar, PermissionsAndroid } from 'react-native';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { GiftedChat, Send, Actions } from 'react-native-gifted-chat';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -38,6 +38,8 @@ const RoomScreen = (props) => {
         path: 'images',
         skipBackup: true
       },
+      takePhotoButtonTitle: 'Сделать фото',
+      chooseFromLibraryButtonTitle: 'Выбрать из галереи',
     }, (response) => {
       if (response.didCancel) {
         return console.log('User cancelled image picker');

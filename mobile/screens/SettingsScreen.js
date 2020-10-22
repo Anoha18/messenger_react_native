@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Text, View, StyleSheet } from 'react-native'
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
@@ -7,7 +7,7 @@ import { Thumbnail, Button, Icon } from 'native-base';
 import { logoutUser } from '../store/actions/user';
 
 const SettingsScreen = (props) => {
-  const { user } = props;
+  const { user, navigation } = props;
 
   return (
     <View style={styles.container}>
@@ -18,6 +18,9 @@ const SettingsScreen = (props) => {
         {/* <Thumbnail /> */}
       </View>
       <View style={styles.exitButtonContainer}>
+        <Button onPress={() => navigation.push('edit_user')} full light iconRight>
+          <Text style={styles.exitText}>Редактировать</Text>
+        </Button>
         <Button onPress={() => props.logoutUser()} full danger iconRight>
           <Text style={styles.exitText}>Выход</Text>
           {/* <Icon name="cog" fontSize={20} /> */}

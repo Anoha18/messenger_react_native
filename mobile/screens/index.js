@@ -15,6 +15,7 @@ import HomeScreen from './HomeScreen';
 import RoomScreen from './RoomScreen';
 import SettingsScreen from './SettingsScreen';
 import SearchUserScreen from './SearchUserScreen';
+import EditUserScreen from './EditUserScreen';
 
 const TabsHome = {
   home: {
@@ -38,6 +39,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const SettingStack = createStackNavigator();
+const EditUserStack = createStackNavigator();
 
 const HomeStackScreen = () => (
   <HomeStack.Navigator
@@ -107,6 +109,25 @@ const LoginStackScreen = () => (
       }}
     />
   </Stack.Navigator>
+);
+
+const EditUserStackScreen = () => (
+  <EditUserStack.Navigator
+    screenOptions={{
+      gestureEnabled: true,
+      gestureDirection: 'horizontal',
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+    }}
+  >
+    <EditUserStack.Screen
+      name="edit_user"
+      component={EditUserScreen}
+      options={{
+        title: 'Редактирование профиля',
+        animationEnabled: true
+      }}
+    />
+  </EditUserStack.Navigator>
 )
 
 const MainTabNav = () => {
@@ -216,7 +237,14 @@ export default ({ navigation }) => {
                   options={{
                     headerShown: false,
                   }}
-                /> 
+                />
+                <Stack.Screen
+                  name="edit_user"
+                  component={EditUserStackScreen}
+                  options={{
+                    headerShown: false
+                  }}
+                />
               </Stack.Navigator>
             </>
           )
