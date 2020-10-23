@@ -82,7 +82,7 @@ export default class Room {
                   and f.deleted = false
                   limit 1
                 ) t
-              ) file
+              ) as file
             from messages m
             where m.room_id = r.id
             and m.deleted = false
@@ -96,12 +96,26 @@ export default class Room {
               u.id,
               u.name,
               u.lastname,
-              u.login
+              u.login,
+              (
+                select row_to_json(t) from (
+                  select
+                    ua.id,
+                    ua.file_id,
+                    f.file_path
+                  from user_avatar ua
+                  inner join files f on f.id = ua.file_id
+                  where ua.user_id = u.id
+                  and f.deleted = false
+                  limit 1
+                ) t
+              ) avatar
             from users u
             where exists (
               select 1 from room_users ru
               where ru.room_id = r.id
               and u.id != ${userId}
+              and ru.user_id = u.id
               and u.deleted = false
               limit 1
             )
@@ -164,7 +178,19 @@ export default class Room {
               u.id,
               u.name,
               u.lastname,
-              u.login
+              u.login,
+              (
+                select row_to_json(t) from (
+                  select
+                    ua.id,
+                    ua.file_id,
+                    f.file_path
+                  from user_avatar ua
+                  inner join files f on f.id = ua.file_id
+                  where ua.user_id = u.id
+                  and f.deleted = false
+                ) t
+              ) avatar
             from users u
             where exists (
               select 1 from room_users ru
@@ -182,7 +208,7 @@ export default class Room {
     return { room: row }
   }
 
-  static async createRoom(params: RoomCreateParams): Promise<{ room?: RoomById, error?: string }> {
+  static async createRoom(params: RoomCreateParams): Promise<{ roomId?: number, error?: string }> {
     const { name, creator_id, type_id } = params;
     const { row, error } = await singleQuery(`
       insert into rooms(name, type_id, creator_id)
@@ -193,6 +219,6 @@ export default class Room {
     if (error) return { error };
     if (!row) return { error: 'Room not created' }
 
-    return this.getRoomById(row.id);
+    return { roomId: row.id };
   }
 }

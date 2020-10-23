@@ -10,7 +10,6 @@ export const uploadFile = (file) => async() => {
         'Content-Type': 'multipart/form-data',
       }
     });
-    console.log(data);
     const { result, error } = data;
     if (error) return { error }
 

@@ -1,6 +1,6 @@
 import BaseController from '../BaseController';
 import { Request, Response } from 'express';
-import { User } from '../../models';
+import { User, File } from '../../models';
 import { UserInterface } from '../../interfaces/user';
 
 interface UserUpdateBody {
@@ -54,11 +54,21 @@ export default class UserController extends BaseController {
 
     if (!user) return res.json({ error: 'Not found user' });
 
-    const { user: updatedUser, error } = await User.updateUserById(user.id, { name: body.name, lastname: body.lastname });
-    if (error) return res.json({ error });
-
-    if (body.file_id) {
-      
+    try {
+      if (body.file_id) {
+        const { error } = await File.saveUserAvatar(user.id, body.file_id);
+        if (error) {
+          console.error('SAVE USER AVATAR ERRROR: ', error);
+        }
+      }
+  
+      const { user: updatedUser, error } = await User.updateUserById(user.id, { name: body.name, lastname: body.lastname });
+      if (error) return res.json({ error });
+  
+      res.json({ result: updatedUser });
+    } catch (error) {
+      console.error(error);
+      res.json({ error: error.message });
     }
   }
 }

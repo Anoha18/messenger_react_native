@@ -24,7 +24,7 @@ export default class User {
           ua.file_id,
           f.file_path
         from user_avatar ua
-        inner join file f on f.id = ua.file_id
+        inner join files f on f.id = ua.file_id
         where ua.user_id = u.id
         order by id desc
         limit 1
@@ -96,9 +96,8 @@ export default class User {
 
   static async updateUserById(userId: number, params: UserUpdateParams): Promise<{ user?: UserInterface, error?: string }> {
     const { error } = await singleQuery(`
-      update users set updated_at = now()
-      and name = $2
-      ${(params.lastname && 'lastname = $3') || ''}
+      update users set updated_at = now(),
+      name = $2 ${(params.lastname && ', lastname = $3') || ''}
       where id = $1
       returning id 
     `, [userId, params.name, params.lastname]);

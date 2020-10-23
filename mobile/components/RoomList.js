@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { List, ListItem, Thumbnail, Body, Left, Right, Badge } from 'native-base';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
+import { SERVER } from '../config';
 
 export default ({
   roomList,
@@ -11,6 +12,7 @@ export default ({
 
   const renderBadge = (room) => {
     const { last_message, not_view_count } = room;
+    if (!last_message) return <></>
     if (last_message.sender_id === user.id) return <></>
     if (!+not_view_count) return <></>
   
@@ -30,19 +32,19 @@ export default ({
         <ListItem key={room.id} onPressOut={() => onSelectRoom(room.id)} avatar>
           <Left>
             {
-              room.recipient.avatar
-                ? <Thumbnail source={{ uri: 'Image URL' }} />
+              room.recipient.avatar && room.recipient.avatar.file_path
+                ? <Thumbnail source={{ uri: `${SERVER.URL}${room.recipient.avatar.file_path}` }} style={{ width: 40, height: 40 }} />
                 : <EvilIcon name="user" size={40} />
             }
           </Left>
           <Body style={styles.body}>
             <Text style={styles.itemTitle}>{(room.recipient && room.recipient.name) || ''} {(room.recipient && room.recipient.lastname) || ''}</Text>
             <Text style={styles.itemDescription}>
-              {(room.last_message.file && ((room.last_message.text && 'Фотография, ') || 'Фотография')) || ''}
+              {(room.last_message && room.last_message.file && ((room.last_message.text && 'Фотография, ') || 'Фотография')) || ''}
               {(room.last_message && room.last_message.text) || ''}</Text>
           </Body>
           <Right>
-            <Text style={{ marginBottom: 5 }} note>{room.last_message.created_time}</Text>
+            <Text style={{ marginBottom: 5 }} note>{(room.last_message && room.last_message.created_time) || ''}</Text>
             {renderBadge(room)}
           </Right>
         </ListItem>

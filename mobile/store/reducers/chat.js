@@ -4,6 +4,7 @@ import {
   SET_MESSAGE_LIST,
   SET_MESSAGE,
   SET_VIEWED_MESSAGES,
+  LOGOUT_USER,
 } from '../types';
 
 const handlers = {
@@ -21,7 +22,7 @@ const handlers = {
   }),
   [SET_MESSAGE]: (state, { message }) => ({
     ...state,
-    messageList: [message, ...state.messageList]
+    messageList: (message.room_id === state.chatRoom.id && [message, ...state.messageList]) || state.messageList
   }),
   [SET_VIEWED_MESSAGES]: (state, { viewedMessages }) => ({
     ...state,
@@ -44,6 +45,10 @@ const handlers = {
 
       return message;
     })
+  }),
+  [LOGOUT_USER]: (state) => ({
+    ...state,
+    ...initState,
   }),
   DEFAULT: (state) => ({
     ...state

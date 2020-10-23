@@ -9,11 +9,12 @@ import {
   Body,
   Button,
   Icon,
-  Title
+  Title,
+  Thumbnail
 } from 'native-base';
 
 export default (props) => {
-  const { onPressBack, title } = props;
+  const { onPressBack, params } = props;
   return (
     <Header
       androidStatusBarColor="#fff"
@@ -31,11 +32,21 @@ export default (props) => {
       </Left>
       <Body style={{ flex: 0 }}>
         <Title style={styles.headerTitle}>
-          {title}
+          {params.title || ''}
         </Title>
       </Body>
       <Right style={{ flex: 1 }}>
-          <EvilIcon name="user" size={40} />
+          { params.avatar
+              ? <Thumbnail
+                  source={{ uri: params.avatar }}
+                  size={40}
+                  style={{
+                    width: 40,
+                    height: 40
+                  }}
+                />
+              : <EvilIcon name="user" size={40} />
+          }
       </Right>
     </Header>
   )

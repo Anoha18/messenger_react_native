@@ -8,6 +8,7 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import { connectSocket, disconnectSocket } from '../store/actions/socket';
 import { Badge, Button } from 'native-base';
 import { Text, View } from 'react-native';
+import { HeaderBackButton } from 'react-navigation-stack';
 
 import LoginScreen from './LoginScreen';
 import RegistrationSreen from './RegistrationSreen';
@@ -39,7 +40,6 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const SettingStack = createStackNavigator();
-const EditUserStack = createStackNavigator();
 
 const HomeStackScreen = () => (
   <HomeStack.Navigator
@@ -110,25 +110,6 @@ const LoginStackScreen = () => (
     />
   </Stack.Navigator>
 );
-
-const EditUserStackScreen = () => (
-  <EditUserStack.Navigator
-    screenOptions={{
-      gestureEnabled: true,
-      gestureDirection: 'horizontal',
-      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-    }}
-  >
-    <EditUserStack.Screen
-      name="edit_user"
-      component={EditUserScreen}
-      options={{
-        title: 'Редактирование профиля',
-        animationEnabled: true
-      }}
-    />
-  </EditUserStack.Navigator>
-)
 
 const MainTabNav = () => {
   const { chatRoomList } = useSelector((state) => state.chat);
@@ -211,42 +192,41 @@ export default ({ navigation }) => {
 
   return (
     <NavigationContainer>
-        {!user
+        {user
           ? (
-            <LoginStackScreen />
-          ) : (
-            <>
-              <Stack.Navigator
-                screenOptions={{
-                  gestureEnabled: true,
-                  gestureDirection: 'horizontal',
-                  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+            <Stack.Navigator
+              screenOptions={{
+                gestureEnabled: true,
+                gestureDirection: 'horizontal',
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+              }}
+              initialRouteName="main"
+            >
+              <Stack.Screen
+                name="main"
+                component={MainTabNav}
+                options={{
+                  headerShown: false,
                 }}
-                initialRouteName="main"
-              >
-                <Stack.Screen
-                  name="main"
-                  component={MainTabNav}
-                  options={{
-                    headerShown: false
-                  }}
-                />
-                <Stack.Screen
-                  name="room"
-                  component={RoomScreen}
-                  options={{
-                    headerShown: false,
-                  }}
-                />
-                <Stack.Screen
-                  name="edit_user"
-                  component={EditUserStackScreen}
-                  options={{
-                    headerShown: false
-                  }}
-                />
-              </Stack.Navigator>
-            </>
+              />
+              <Stack.Screen
+                name="room"
+                component={RoomScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="edit_user"
+                component={EditUserScreen}
+                options={{
+                  headerShown: true,
+                  title: 'Редактирование профиля',
+                }}
+              />
+            </Stack.Navigator>
+          ) : (
+            <LoginStackScreen />
           )
         }
     </NavigationContainer>

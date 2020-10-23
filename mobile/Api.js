@@ -98,13 +98,13 @@ class Api {
    * @param {AxiosRequestConfig} params 
    * @returns {Promise<import('axios').AxiosResponse>}
    */
-  async post(path, data, params) {
+  async post(path, data, params = {}) {
     try {
       const result = await axios.post(`${this.url}${path}`, data, {
-        ...params,
+        ...params || {},
         ...{
           headers: {
-            ...params.headers,
+            ...params.headers || {},
             ...{
               Authorization: this.token ? `Bearer ${this.token}` : undefined,
             }

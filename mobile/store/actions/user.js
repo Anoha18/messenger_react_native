@@ -1,7 +1,8 @@
 import {
   SET_USER,
   SET_ACCESS_TOKEN,
-  SET_REFRESH_TOKEN
+  SET_REFRESH_TOKEN,
+  LOGOUT_USER
 } from '../types';
 import { SERVER } from '../../config';
 import axios from 'axios';
@@ -50,6 +51,7 @@ export const logoutUser = () => async(dispatch, getState) => {
     dispatch({ type: SET_REFRESH_TOKEN, refreshToken: null });
     api.setToken(null);
     api.setRefreshToken(null);
+    dispatch({ type: LOGOUT_USER });
   } catch (error) {
     console.error('ERROR LOGOUT: ', error);
   }
@@ -172,3 +174,17 @@ export const setRefreshToken = (refreshToken) => ({
   type: SET_REFRESH_TOKEN,
   refreshToken
 });
+
+export const updateUser = (params) => async(dispatch) => {
+  try {
+    const { data } = await api.post('/user/update', params);
+    const { error, result } = data;
+    if (error) return { error }
+
+    dispatch(setUser(result));
+    return { user: result };
+  } catch (error) {
+    console.error(error);
+    return { error: error.message }
+  }
+}

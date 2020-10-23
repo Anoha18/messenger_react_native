@@ -20,6 +20,7 @@ import {
 import { connect } from 'react-redux';
 import { searchUsers } from '../store/actions/user';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
+import { SERVER } from '../config';
 
 const SearchUsersScreen = (props) => {
   const { searchUsers, navigation } = props;
@@ -45,8 +46,8 @@ const SearchUsersScreen = (props) => {
         {users.map(user => (
           <ListItem key={user.id} onPressOut={() => navigation.push('room', { selectedUser: user })} avatar>
             <Left>
-              {user.avatar
-                ? <Thumbnail source={{ uri: 'Image URL' }} />
+              {user.avatar && user.avatar.file_path
+                ? <Thumbnail source={{ uri: `${SERVER.URL}${user.avatar.file_path}` }} style={{ height: 40, width: 40 }} />
                 : <EvilIcon name="user" size={40} />
               }
             </Left>

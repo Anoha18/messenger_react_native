@@ -51,16 +51,20 @@ export default class ChatRoomController extends BaseController {
 
     const { row } = await singleQuery('select id from room_types where brief = $1', ['PRIVATE'])
 
-    const { room, error: createRoomError } = await Room.createRoom({
+    const { roomId: savedRoomId, error: createRoomError } = await Room.createRoom({
       creator_id: user.id,
       type_id: row.id
     });
     if (createRoomError) return res.json({ error: createRoomError });
-    if (!room) return res.json({ error: 'Room not created' });
+    if (!savedRoomId) return res.json({ error: 'Room not created' });
 
-    const { error: saveUsersListError } = await RoomUser.saveUsersByRoom(userIdList, room.id);
+    const { error: saveUsersListError } = await RoomUser.saveUsersByRoom(userIdList, savedRoomId);
     if (saveUsersListError) return res.json({ error: saveUsersListError });
 
+    const { room, error: getRoomByIdError } = await Room.getRoomById(savedRoomId);
+    if (getRoomByIdError) {
+      return res.json({ error: getRoomByIdError })
+    }
     res.json({ result: room });
   }
 }

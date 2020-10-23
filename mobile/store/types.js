@@ -10,3 +10,4 @@ export const SET_CHAT_ROOM = 'SET_CHAT_ROOM';
 export const SET_MESSAGE_LIST = 'SET_MESSAGE_LIST';
 export const SET_MESSAGE = 'SET_MESSAGE';
 export const SET_VIEWED_MESSAGES = 'SET_VIEWED_MESSAGES';
+export const LOGOUT_USER = 'LOGOUT_USER';

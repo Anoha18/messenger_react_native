@@ -35,7 +35,19 @@ export default class Message {
               u.name,
               u.lastname,
               u.login,
-              u.id
+              u.id,
+              (
+                select row_to_json(t) from (
+                  select
+                    ua.id,
+                    ua.file_id,
+                    f.file_path
+                  from user_avatar ua
+                  inner join files f on f.id = ua.file_id
+                  where ua.user_id = u.id
+                  and f.deleted = false
+                ) t
+              ) avatar
             from users u
             where u.id = m.sender_id
           ) t

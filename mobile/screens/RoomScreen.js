@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
-import { GiftedChat, Send, Actions } from 'react-native-gifted-chat';
+import { GiftedChat, Send, Actions, Avatar } from 'react-native-gifted-chat';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { RoomHeader } from '../headers';
@@ -89,15 +89,28 @@ const RoomScreen = (props) => {
     checkView();
   }, [messageList])
 
-  const roomTitle = () => {
+  const roomHeaderParams = () => {
     if (!chatRoom && selectedUser) {
-      return `${selectedUser.name} ${selectedUser.lastname || ''}`
+      return {
+        title: `${selectedUser.name} ${selectedUser.lastname || ''}`,
+        avatar: selectedUser.avatar && selectedUser.avatar.file_path
+          ? `${SERVER.URL}${selectedUser.avatar.file_path}`
+          : null
+      }
     } else if (chatRoom) {
       const recipient = chatRoom.users.find(_user => _user.id !== user.id);
-      return `${recipient.name} ${recipient.lastname || ''}`
+      return {
+        title: `${recipient.name} ${recipient.lastname || ''}`,
+        avatar: recipient.avatar && recipient.avatar.file_path
+          ? `${SERVER.URL}${recipient.avatar.file_path}`
+          : null
+      }
     }
 
-    return ''
+    return {
+      title: '',
+      avatar: null
+    }
   }
 
   const sendMessage = async ([message]) => {
@@ -154,7 +167,7 @@ const RoomScreen = (props) => {
     <>
       <StatusBar backgroundColor="#8E8E8F" />
       <RoomHeader
-        title={roomTitle()}
+        params={roomHeaderParams()}
         onPressBack={() => navigation.goBack()}
       />
       <GiftedChat
@@ -171,7 +184,10 @@ const RoomScreen = (props) => {
           image: (message.file && message.file.file_path && `${SERVER.URL}${message.file.file_path}`) || undefined,
           user: {
             _id: message.sender_id,
-            name: `${(message.sender && message.sender.name) || ''} ${(message.sender && message.sender.lastname) || ''}`
+            name: `${(message.sender && message.sender.name) || ''} ${(message.sender && message.sender.lastname) || ''}`,
+            avatar: message.sender.avatar && message.sender.avatar.file_path
+              ? `${SERVER.URL}${message.sender.avatar.file_path}`
+              : undefined
           },
           views: message.views
         }))}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, ScrollView, StyleSheet, Alert } from 'react-native';
-import { Button, View, Thumbnail, Form, Item, Input, Label } from 'native-base';
+import { Button, View, Thumbnail, Form, Item, Input, Label, Toast } from 'native-base';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
@@ -8,16 +8,19 @@ import { SERVER } from '../config';
 import ImagePicker from 'react-native-image-picker';
 import ImagePickerCrop from 'react-native-image-crop-picker';
 import { uploadFile } from '../store/actions/file';
+import { updateUser } from '../store/actions/user';
 
 const EditUserScreen = (props) => {
   const {
     navigation,
     user,
     uploadFile,
+    updateUser,
   } = props;
   const [name, setName] = useState(user.name || '');
   const [lastname, setLastname] = useState(user.lastname || '');
   const [newAvatar, setNewAvatar] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const pickNewAvatar = () => {
     ImagePicker.showImagePicker({
@@ -56,9 +59,10 @@ const EditUserScreen = (props) => {
       includeBase64: true,
       includeExif: true,
       mediaType: 'photo',
-    }).then(image => {
-      console.log(image);
-      setNewAvatar(image);
+    }).then(cropedImage => {
+      const filename = cropedImage.path.substring(cropedImage.path.lastIndexOf('/') + 1, cropedImage.path.length)
+      setNewAvatar({ ...cropedImage, ...{ filename }});
+      console.log(newAvatar);
     }).catch(error => console.error(error));
   }
 
@@ -69,6 +73,44 @@ const EditUserScreen = (props) => {
     if (!name) {
       return Alert.alert('Ошибка', 'Поле "Имя" не должно быть пустым')
     }
+    setLoading(true);
+
+    const newUserData = {
+      name,
+      lastname
+    };
+
+    if (newAvatar) {
+      const { file: savedFile, error } = await uploadFile({
+        uri: newAvatar.path,
+        type: newAvatar.mime,
+        name: newAvatar.filename,
+        data: newAvatar.data,
+      });
+
+      if (error) {
+        setLoading(false);
+        return Alert.alert('Ошибка', error);
+      }
+
+      newUserData.file_id = savedFile.id;
+    }
+
+
+    const { user, error } = await updateUser(newUserData);
+    if (error) {
+      setLoading(false);
+      return Alert.alert('Ошибка', error);
+    }
+
+    setLoading(false);
+    Toast.show({
+      text: 'Профиль успешно обновлен',
+      buttonText: 'ОК',
+      type: 'success',
+      duration: 3000
+    });
+    navigation.goBack();
   }
 
   return (
@@ -86,6 +128,7 @@ const EditUserScreen = (props) => {
                   style={{
                     width: 100,
                     height: 100,
+                    borderRadius: 50
                   }}
                   borderRadius={50}
                 />
@@ -95,14 +138,17 @@ const EditUserScreen = (props) => {
               )
           }
           <Ionicon onPress={() => pickNewAvatar()} style={styles.cameraIcon} name="camera" size={60} color="white" />
-          <View style={{
-            position: 'absolute',
-            zIndex: 1,
-            backgroundColor: 'rgba(0,0,0, 0.5)',
-            width: 100,
-            height: 100,
-            borderRadius: 50
-          }} />
+          <View
+            onPress={() => pickNewAvatar()}
+            style={{
+              position: 'absolute',
+              zIndex: 1,
+              backgroundColor: 'rgba(0,0,0, 0.5)',
+              width: 100,
+              height: 100,
+              borderRadius: 50
+            }}
+          />
         </View>
         <Text style={{ marginTop: 10 }}>@{user.login}</Text>
         <View style={{ width: '100%', paddingLeft: 5, paddingRight: 5, marginTop: 15 }}>
@@ -110,7 +156,7 @@ const EditUserScreen = (props) => {
             <Label>Имя</Label>
             <Input value={name} onChangeText={(text) => setName(text)} />
           </Item>
-          <Item floatingLabel>
+          <Item style={{ marginTop: 8 }} floatingLabel>
             <Label>Фамилия</Label>
             <Input value={lastname} onChangeText={(text) => setLastname(text)} />
           </Item>
@@ -118,7 +164,7 @@ const EditUserScreen = (props) => {
 
       </ScrollView>
       <View style={styles.footerContainer}>
-        <Button onPress={() => save()} block primary>
+        <Button onPress={() => save()} block primary disabled={loading}>
           <Text style={styles.saveText}>Сохранить</Text>
         </Button>
         <Button style={{ marginTop: 5 }} onPress={() => navigation.goBack()} block light>
@@ -171,6 +217,7 @@ export default connect(
     user: state.user.user,
   }),
   {
-    uploadFile
+    uploadFile,
+    updateUser
   }
 ) (EditUserScreen);
