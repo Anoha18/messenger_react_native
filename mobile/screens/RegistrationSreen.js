@@ -35,7 +35,8 @@ const RegistrationScreen = ({ navigation, registerUser }) => {
       <View style={{
         flexShrink: 0,
         flexGrow: 1,
-        paddingTop: 10
+        paddingTop: 10,
+        marginBottom: 50
       }}>
         <View style={{ marginTop: 15 }}>
           <Item floatingLabel>
@@ -56,9 +57,6 @@ const RegistrationScreen = ({ navigation, registerUser }) => {
             <Label style={styles.formLabel}>Подтверждение пароля*</Label>
             <Input textContentType={'password'} secureTextEntry={true} onChangeText={(text) => setConfirmPassword(text)} />
           </Item>
-          {/* <View>
-            <Text>{}</Text>
-          </View> */}
         </View>
       </View>
       <View style={{ paddingBottom: 15 }}>

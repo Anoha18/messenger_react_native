@@ -1,6 +1,6 @@
 module.exports =  {
   SERVER: {
-    URL: 'http://10.0.2.2:3000',
+    URL: 'http://104.155.162.16',
     API_PATH: '/api'
   },
   SOCKET: {
