@@ -6,9 +6,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import IconAntd from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { connectSocket, disconnectSocket } from '../store/actions/socket';
-import { Badge, Button } from 'native-base';
+import { Badge, Button, Spinner } from 'native-base';
 import { Text, View } from 'react-native';
-import { HeaderBackButton } from 'react-navigation-stack';
 
 import LoginScreen from './LoginScreen';
 import RegistrationSreen from './RegistrationSreen';
@@ -41,27 +40,50 @@ const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const SettingStack = createStackNavigator();
 
-const HomeStackScreen = () => (
-  <HomeStack.Navigator
-    screenOptions={{
-      gestureEnabled: true,
-      gestureDirection: 'horizontal',
-      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
-    }}
-  >
-    <HomeStack.Screen
-      name="home"
-      component={HomeScreen}
-      options={{
-        headerTitle: 'Чаты',
-        headerShown: true,
-        headerTitleStyle: {
-          alignSelf: 'center'
-        }
+const HomeStackScreen = () => {
+  const { connect } = useSelector(state => state.socket);
+  return (
+    <HomeStack.Navigator
+      screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
       }}
-    />
-  </HomeStack.Navigator>
-);
+    >
+      <HomeStack.Screen
+        name="home"
+        component={HomeScreen}
+        options={{
+          headerTitle: () => (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {!connect && <Spinner color="blue" style={{ marginLeft: -20 }} size={20} />}
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                  alignSelf: 'center',
+                  marginLeft: (!connect && 10) || undefined,
+                }}
+              >
+                Чаты
+              </Text>
+            </View>
+          ),
+          headerShown: true,
+          headerTitleStyle: {
+            alignSelf: 'center'
+          }
+        }}
+      />
+    </HomeStack.Navigator>
+  );
+}
 
 const SettingsStackScreen = () => (
   <SettingStack.Navigator

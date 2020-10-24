@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, Alert } from 'react-native';
 import { GiftedChat, Send, Actions, Avatar } from 'react-native-gifted-chat';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { RoomHeader } from '../headers';
 import { connect } from 'react-redux';
-import { getChatRoomByUserId, sendMessage, createChatRoom } from '../store/actions/chat';
+import { getChatRoomByUserId, sendMessage, createChatRoom, resetChatRoom } from '../store/actions/chat';
 import { connectToChatRoom, sendNewMessage, viewMessages } from '../store/actions/socket';
 import { Toast, Thumbnail, ActionSheet } from 'native-base';
 import moment from 'moment';
@@ -25,6 +25,7 @@ const RoomScreen = (props) => {
     connectToChatRoom,
     messageList,
     viewMessages,
+    resetChatRoom
   } = props;
   const { params } = route;
   const { chatRoomId, selectedUser } = params;
@@ -67,12 +68,16 @@ const RoomScreen = (props) => {
           })
         }
         
-        if (room) connectToChatRoom(room.id);
+        if (room) await connectToChatRoom(room.id);
       } else {
         await connectToChatRoom(chatRoomId);
       }
     }
     loadRoom();
+
+    return() => {
+      resetChatRoom();
+    }
   }, [])
 
   useEffect(() => {
@@ -81,7 +86,7 @@ const RoomScreen = (props) => {
 
       for (const message of messageList) {
         if (!message.views.find(view => view.user_id === user.id)) {
-          return viewMessages(chatRoomId);
+          return viewMessages(chatRoomId || +chatRoom.id);
         }
       }
     }
@@ -131,13 +136,17 @@ const RoomScreen = (props) => {
         return;
       }
 
-      connectToChatRoom(room.id)
+      if (error) return Alert.alert('Ошибка', error);
+      if (!room) return Alert.alert('Ошибка', 'Произошла внутренная ошибка сервера. Обратитесь в службу поддержки.')
+
+      await connectToChatRoom(room.id)
       _message.room_id = room.id;
-    } else {
+    } 
+    if (chatRoomId) {
       _message.room_id = chatRoomId;
     }
 
-    sendNewMessage(_message);
+    await sendNewMessage(_message);
     setText('');
     setImage(null);
   }
@@ -247,5 +256,6 @@ export default connect(
     createChatRoom,
     connectToChatRoom,
     viewMessages,
+    resetChatRoom
   }
 ) (RoomScreen);

@@ -22,7 +22,7 @@ const handlers = {
   }),
   [SET_MESSAGE]: (state, { message }) => ({
     ...state,
-    messageList: (message.room_id === state.chatRoom.id && [message, ...state.messageList]) || state.messageList
+    messageList: (+message.room_id === +state.chatRoom.id && [message, ...state.messageList]) || state.messageList
   }),
   [SET_VIEWED_MESSAGES]: (state, { viewedMessages }) => ({
     ...state,

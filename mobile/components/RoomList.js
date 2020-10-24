@@ -18,7 +18,7 @@ export default ({
   
     const { views } = last_message;
     if (!views.includes(user.id)) return (
-      <Badge style={{ backgroundColor: 'blue' }}>
+      <Badge style={{ backgroundColor: 'blue', height: 20, width: 20 }}>
         <Text style={{ color: '#fff' }}>{not_view_count}</Text>
       </Badge>
     )

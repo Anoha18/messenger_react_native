@@ -1,5 +1,5 @@
 import api from '../../Api';
-import { SET_CHAT_ROOM } from '../types';
+import { SET_CHAT_ROOM, SET_MESSAGE_LIST } from '../types';
 
 export const getChatRoomByUserId = (userId) => async (dispatch) => {
   try {
@@ -61,4 +61,15 @@ export const sendMessage = (message) => async() => {
     console.error(error);
     return { error: error.message }
   }
+}
+
+export const resetChatRoom = () => (dispatch) => {
+  dispatch({
+    type: SET_CHAT_ROOM,
+    chatRoom: null
+  });
+  dispatch({
+    type: SET_MESSAGE_LIST,
+    messageList: []
+  })
 }
