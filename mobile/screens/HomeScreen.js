@@ -1,10 +1,13 @@
 import React from 'react';
 import { StyleSheet, ScrollView, StatusBar, View, Text } from 'react-native';
+import { useSelector } from 'react-redux';
 import RoomList from '../components/RoomList';
-import { connect } from 'react-redux';
 
 const HomeScreen = (props) => {
-  const { navigation, chatRoomList, user } = props;
+  const { navigation } = props;
+  const chatRoomList = useSelector(state => state.chat.chatRoomList);
+  const user = useSelector(state => state.user.user);
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -24,13 +27,7 @@ const HomeScreen = (props) => {
   )
 }
 
-export default connect(
-  state => ({
-    chatRoomList: state.chat.chatRoomList,
-    user: state.user.user
-  }),
-  {}
-)(HomeScreen)
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -46,4 +43,4 @@ const styles = StyleSheet.create({
   notRoomListText: {
     color: 'gray'
   }
-})
+});

@@ -7,7 +7,7 @@ import IconAntd from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { connectSocket, disconnectSocket } from '../store/actions/socket';
 import { Badge, Button, Spinner } from 'native-base';
-import { Text, View } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 
 import LoginScreen from './LoginScreen';
 import RegistrationSreen from './RegistrationSreen';
@@ -16,6 +16,8 @@ import RoomScreen from './RoomScreen';
 import SettingsScreen from './SettingsScreen';
 import SearchUserScreen from './SearchUserScreen';
 import EditUserScreen from './EditUserScreen';
+import GroupChatCreateScreen from './GroupChatCreateScreen';
+import SelectCompetitorsScreen from './SelectCompetitorsScreen';
 
 const TabsHome = {
   home: {
@@ -39,6 +41,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const SettingStack = createStackNavigator();
+const CreateGroupStack = createStackNavigator();
 
 const HomeStackScreen = () => {
   const { connect } = useSelector(state => state.socket);
@@ -53,7 +56,7 @@ const HomeStackScreen = () => {
       <HomeStack.Screen
         name="home"
         component={HomeScreen}
-        options={{
+        options={({ navigation }) => ({
           headerTitle: () => (
             <View
               style={{
@@ -75,11 +78,28 @@ const HomeStackScreen = () => {
               </Text>
             </View>
           ),
+          headerRight: () => (
+            <TouchableOpacity
+              hitSlop={{
+                top: 10,
+                right: 10,
+                bottom: 10,
+                left: 10,
+              }}
+              onPress={() => navigation.navigate('group_chat_create')}
+            >
+              <IconAntd name="plus" size={25} color="black" />
+            </TouchableOpacity>
+          ),
+          headerLeft: () => <View />,
+          headerRightContainerStyle: {
+            paddingRight: 20
+          },
           headerShown: true,
           headerTitleStyle: {
             alignSelf: 'center'
           }
-        }}
+        })}
       />
     </HomeStack.Navigator>
   );
@@ -193,6 +213,53 @@ const MainTabNav = () => {
   )
 }
 
+const CreateGroupStackScreen = () => (
+  <Stack.Navigator
+    initialRouteName="select_competitors_group"
+    screenOptions={{
+      gestureEnabled: true,
+      gestureDirection: 'horizontal',
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+    }}
+  >
+    <Stack.Screen
+      name="select_competitors_group"
+      component={SelectCompetitorsScreen}
+      options={({ route }) => ({
+        title: 'Новая беседа',
+        headerRightContainerStyle: {
+          paddingRight: 20,
+        },
+        headerRight: () => (route.params && route.params.next && (
+          <TouchableOpacity
+            hitSlop={{
+              top: 10,
+              right: 10,
+              bottom: 10,
+              left: 10,
+            }}
+            onPress={() => route.params.next()}
+          >
+            <Text
+              style={{
+                color: 'blue',
+                fontWeight: 'bold'
+              }}
+            >Далее</Text>
+          </TouchableOpacity>
+        ) || <></>)
+      })}
+    />
+    <Stack.Screen
+      name="create_group"
+      component={GroupChatCreateScreen}
+      options={{
+        title: 'Новая беседа'
+      }}
+    />
+  </Stack.Navigator>
+);
+
 export default ({ navigation }) => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.user);
@@ -244,6 +311,13 @@ export default ({ navigation }) => {
                 options={{
                   headerShown: true,
                   title: 'Редактирование профиля',
+                }}
+              />
+              <Stack.Screen
+                name="group_chat_create"
+                component={CreateGroupStackScreen}
+                options={{
+                  headerShown: false
                 }}
               />
             </Stack.Navigator>

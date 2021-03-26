@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, Alert, ScrollView, StatusBar } from 'react-native';
 import {
   Container,
@@ -18,16 +18,39 @@ import {
   Title
 } from 'native-base';
 import { connect } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 import { searchUsers } from '../store/actions/user';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import { SERVER } from '../config';
 
 const SearchUsersScreen = (props) => {
+  const isFocused = useIsFocused();
+  const searchInput = useRef();
   const { searchUsers, navigation } = props;
   const [searchText, setSearchText] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false)
+
+  useEffect(() => {
+    const init = async() => {
+      setLoading(true)
+      const { userList, error } = await searchUsers({ searchText: '', offset: 0, limit: 20 });
+      if (error) return Alert(error);
+
+      setUsers(userList);
+      setLoading(false);
+      setIsFetching(true);
+    }
+
+    init();
+  }, []);
+
+  useEffect(() => {
+    if (isFocused && searchInput.current) {
+      searchInput.current._root.focus();
+    }
+  }, [isFocused]);
 
   const searchUser = async () => {
     if (!searchText.trim()) return;
@@ -82,7 +105,14 @@ const SearchUsersScreen = (props) => {
       >
         <Item style={{ backgroundColor: 'lightgray' }}>
           <Icon name="ios-search" />
-          <Input value={searchText} returnKeyType="search" onSubmitEditing={() => searchUser()} onChangeText={(text) => setSearchText(text)} placeholder="Поиск" />
+          <Input
+            ref={searchInput}
+            value={searchText}
+            returnKeyType="search"
+            onSubmitEditing={() => searchUser()}
+            onChangeText={(text) => setSearchText(text)}
+            placeholder="Поиск"
+          />
           <Icon name="ios-people" />
         </Item>
         <Button onPress={() => searchUser()} transparent>
