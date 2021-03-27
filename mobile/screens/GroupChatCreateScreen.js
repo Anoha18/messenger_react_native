@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import {
   ListItem,
@@ -17,6 +19,7 @@ import {
 import { useDispatch } from 'react-redux';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import { SERVER } from '../config';
+import { createGroupChatRoom } from '../store/actions/chat';
 
 const GroupChatCreateScreen = ({
   navigation,
@@ -25,6 +28,7 @@ const GroupChatCreateScreen = ({
   const dispatch = useDispatch();
   const [competitors, setCompetitors] = useState([]);
   const [nameGroup, setNameGroup] = useState('');
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     const init = () => {
@@ -37,8 +41,16 @@ const GroupChatCreateScreen = ({
     init();
   }, []);
 
-  const createGroup = () => {
-    // TODO: Добавить создание беседы
+  const createGroup = async () => {
+    if (!nameGroup || !nameGroup.trim()) return Alert.alert('Ошибка', 'Введите название беседы');
+    setFetching(true);
+    const { error } = await dispatch(await createGroupChatRoom({
+      groupName,
+      competitorsId: competitors.map(c => c.id),
+    }))
+    setFetching(false);
+
+    if (error) return Alert.alert('Ошибка', error);
   }
 
   return (
@@ -58,7 +70,7 @@ const GroupChatCreateScreen = ({
           style={{ flexGrow: 1 }}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item: user }) => (
-            <ListItem key={user.id} onPressOut={() => {}} style={{ paddingLeft: 0, marginLeft: 0 }} avatar>
+            <ListItem activeOpacity={1} key={user.id} onPressOut={() => {}} style={{ paddingLeft: 0, marginLeft: 0 }} avatar>
               <Left>
                 {user.avatar && user.avatar.file_path
                   ? <Thumbnail source={{ uri: `${SERVER.URL}${user.avatar.file_path}` }} style={{ height: 40, width: 40 }} />
@@ -76,11 +88,15 @@ const GroupChatCreateScreen = ({
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.footerBtn, !nameGroup || !nameGroup.trim() ? { backgroundColor: 'gray' } : null]}
-          disabled={!nameGroup || !nameGroup.trim()}
-          onPress={() => {}}
+          disabled={!nameGroup || !nameGroup.trim() || fetching}
+          onPress={() => createGroup()}
           activeOpacity={0.8}
         >
-          <Text style={styles.footerText}>Создать беседу</Text>
+          {fetching && (
+            <ActivityIndicator size={22} color="#fff" />
+          ) || (
+            <Text style={styles.footerText}>Создать беседу</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

@@ -1,5 +1,9 @@
 import api from '../../Api';
-import { SET_CHAT_ROOM, SET_MESSAGE_LIST } from '../types';
+import {
+  SET_CHAT_ROOM,
+  SET_MESSAGE_LIST,
+  CREATE_GROUP_CHAT
+} from '../types';
 
 export const getChatRoomByUserId = (userId) => async (dispatch) => {
   try {
@@ -72,4 +76,21 @@ export const resetChatRoom = () => (dispatch) => {
     type: SET_MESSAGE_LIST,
     messageList: []
   })
+}
+
+export const createGroupChatRoom = (params) => async (dispatch) => {
+  try {
+    const { data } = await api.post('/chat/group_new', params);
+    const { result, error } = data;
+
+    if (error) return { error };
+
+    dispatch({
+      type: SET_CHAT_ROOM,
+      chatRoom: result || null,
+    })
+  } catch (error) {
+    console.error('Error. Create group chat ', error);
+    return { error: error.message };
+  }
 }

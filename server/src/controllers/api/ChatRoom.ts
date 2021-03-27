@@ -1,11 +1,16 @@
 import { Request, Response } from 'express';
 import BaseController from '../BaseController';
-import { Room, Message, RoomUser } from '../../models';
+import { Room, Message, RoomUser, RoomType } from '../../models';
 import { UserInterface } from '../../interfaces/user';
 import { singleQuery } from '../../db';
 
 interface NewRoomBody {
   userId: number | string,
+}
+
+interface NewGroupRoomBody {
+  groupName: string,
+  competitorsId: Array<number>,
 }
 
 export default class ChatRoomController extends BaseController {
@@ -17,6 +22,7 @@ export default class ChatRoomController extends BaseController {
   private initRoute():void {
     this.router.get('/with', this.getWith);
     this.router.put('/new', this.putNew);
+    this.router.post('/group_new', this.createGroupChat);
   }
 
   private async getWith(req: Request, res: Response) {
@@ -66,5 +72,20 @@ export default class ChatRoomController extends BaseController {
       return res.json({ error: getRoomByIdError })
     }
     res.json({ result: room });
+  }
+
+  private async createGroupChat(req: Request, res: Response): Promise<void> {
+    const briefGroupRoom = 'CONVERSATION';
+    const body: NewGroupRoomBody = req.body as NewGroupRoomBody;
+    try {
+      const roomType = await RoomType.getByBrief(briefGroupRoom);
+      if (!roomType) {
+        console.error('Error. Create group room. Not found room type by ', briefGroupRoom);
+        
+      }
+    } catch (error) {
+      console.error('Error. Create group room ', error.message);
+      res.json({ error: error.message });
+    }
   }
 }

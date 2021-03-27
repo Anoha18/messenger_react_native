@@ -22,6 +22,9 @@ export const connectSocket = () => (dispatch, getState) => {
     },
     path: SOCKET.PATH,
     rejectUnauthorized: false,
+    reconnection: true,
+    reconnectionAttempts: 999999,
+    reconnectionDelay: 2000,
     transportOptions: {
       polling: {
         extraHeaders: {

@@ -4,6 +4,7 @@ import Message from './Message';
 import RoomUser from './RoomUser';
 import MessageView from './MessageView';
 import File from './File';
+import RoomType from './RoomType';
 
 export {
   User,
@@ -12,4 +13,5 @@ export {
   RoomUser,
   MessageView,
   File,
+  RoomType,
 };
