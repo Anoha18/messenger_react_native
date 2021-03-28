@@ -27,7 +27,7 @@ const GroupChatCreateScreen = ({
 }) => {
   const dispatch = useDispatch();
   const [competitors, setCompetitors] = useState([]);
-  const [nameGroup, setNameGroup] = useState('');
+  const [groupName, setgroupName] = useState('');
   const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
@@ -42,15 +42,17 @@ const GroupChatCreateScreen = ({
   }, []);
 
   const createGroup = async () => {
-    if (!nameGroup || !nameGroup.trim()) return Alert.alert('Ошибка', 'Введите название беседы');
+    if (!groupName || !groupName.trim()) return Alert.alert('Ошибка', 'Введите название беседы');
     setFetching(true);
-    const { error } = await dispatch(await createGroupChatRoom({
+    const { room, error } = await dispatch(await createGroupChatRoom({
       groupName,
       competitorsId: competitors.map(c => c.id),
     }))
     setFetching(false);
 
     if (error) return Alert.alert('Ошибка', error);
+
+    navigation.navigate('room', { chatRoomId: room.id });
   }
 
   return (
@@ -60,8 +62,8 @@ const GroupChatCreateScreen = ({
         numberOfLines={2}
         placeholder="Название беседы"
         autoFocus
-        value={nameGroup}
-        onChangeText={setNameGroup}
+        value={groupName}
+        onChangeText={setgroupName}
       />
       <View style={styles.listContainer}>
         <Text style={styles.listTitle}>Участники</Text>
@@ -87,8 +89,8 @@ const GroupChatCreateScreen = ({
       </View>
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.footerBtn, !nameGroup || !nameGroup.trim() ? { backgroundColor: 'gray' } : null]}
-          disabled={!nameGroup || !nameGroup.trim() || fetching}
+          style={[styles.footerBtn, !groupName || !groupName.trim() ? { backgroundColor: 'gray' } : null]}
+          disabled={!groupName || !groupName.trim() || fetching}
           onPress={() => createGroup()}
           activeOpacity={0.8}
         >

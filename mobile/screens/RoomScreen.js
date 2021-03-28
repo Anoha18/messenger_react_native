@@ -13,6 +13,7 @@ import 'moment/locale/ru';
 import ImagePicker from 'react-native-image-picker';
 import RoomImageViewer from '../components/RoomImageViewer';
 import { SERVER } from '../config';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const RoomScreen = (props) => {
   const {
@@ -41,6 +42,7 @@ const RoomScreen = (props) => {
       },
       takePhotoButtonTitle: 'Сделать фото',
       chooseFromLibraryButtonTitle: 'Выбрать из галереи',
+      quality: 0.4,
     }, (response) => {
       if (response.didCancel) {
         return console.log('User cancelled image picker');
@@ -50,7 +52,6 @@ const RoomScreen = (props) => {
         return console.log('User tapped custom button: ', response.customButton);
       }
 
-      console.log(response);
       setImage(response);
     })
   }
@@ -103,12 +104,19 @@ const RoomScreen = (props) => {
           : null
       }
     } else if (chatRoom) {
-      const recipient = chatRoom.users.find(_user => _user.id !== user.id);
+      if (chatRoom.type_brief === 'PRIVATE') {
+        const recipient = chatRoom.users.find(_user => _user.id !== user.id);
+        return {
+          title: `${recipient.name} ${recipient.lastname || ''}`,
+          avatar: recipient.avatar && recipient.avatar.file_path
+            ? `${SERVER.URL}${recipient.avatar.file_path}`
+            : null
+        }
+      }
+
       return {
-        title: `${recipient.name} ${recipient.lastname || ''}`,
-        avatar: recipient.avatar && recipient.avatar.file_path
-          ? `${SERVER.URL}${recipient.avatar.file_path}`
-          : null
+        title: chatRoom.name,
+        renderAvatar: () => <FontAwesome name="users" size={35} />,
       }
     }
 
@@ -174,11 +182,11 @@ const RoomScreen = (props) => {
 
   return (
     <>
-      <StatusBar backgroundColor="#8E8E8F" />
       <RoomHeader
         params={roomHeaderParams()}
-        onPressBack={() => navigation.goBack()}
+        onPressBack={() => navigation.navigate('home')}
       />
+      <StatusBar barStyle="dark-content" />
       <GiftedChat
         onSend={sendMessage}
         user={{

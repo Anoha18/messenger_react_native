@@ -225,30 +225,12 @@ const CreateGroupStackScreen = () => (
     <Stack.Screen
       name="select_competitors_group"
       component={SelectCompetitorsScreen}
-      options={({ route }) => ({
+      options={{
         title: 'Новая беседа',
         headerRightContainerStyle: {
           paddingRight: 20,
         },
-        headerRight: () => (route.params && route.params.next && (
-          <TouchableOpacity
-            hitSlop={{
-              top: 10,
-              right: 10,
-              bottom: 10,
-              left: 10,
-            }}
-            onPress={() => route.params.next()}
-          >
-            <Text
-              style={{
-                color: 'blue',
-                fontWeight: 'bold'
-              }}
-            >Далее</Text>
-          </TouchableOpacity>
-        ) || <></>)
-      })}
+      }}
     />
     <Stack.Screen
       name="create_group"

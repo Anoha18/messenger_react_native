@@ -56,18 +56,6 @@ const SelectCompetitorsScreen = ({
     search();
   }, [debouncedSearch]);
 
-  useEffect(() => {
-    if (competitors.length) {
-      navigation.setParams({
-        next: () => navigation.navigate('create_group', { competitors }),
-      })
-    } else {
-      navigation.setParams({
-        next: undefined
-      });
-    }
-  }, [competitors.length]);
-
   const search = async () => {
     setFetching(true);
     const { userList, error } = await dispatch(await searchUsers({ searchText, offset: 0, limit: 20 }));
@@ -86,103 +74,109 @@ const SelectCompetitorsScreen = ({
         autoFocus
       />
       {(competitors.length && (
-        <FlatList
-          style={{
-            flexDirection: 'row',
-            flexGrow: 0,
-            marginTop: 20,
-            marginBottom: 10,
-          }}
-          horizontal
-          data={competitors}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item: user }) => (
-            <TouchableOpacity
-              style={{
-                position: 'relative',
-              }}
-              activeOpacity={1}
-              onPress={() => setCompetitors(competitors.filter(c => c.id !== user.id))}
-            >
-              <Ionicons
-                name="ios-close-circle"
-                size={20}
+          <FlatList
+            style={{
+              flexDirection: 'row',
+              flexGrow: 0,
+              marginTop: 20,
+              marginBottom: 10,
+            }}
+            horizontal
+            data={competitors}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item: user }) => (
+              <TouchableOpacity
                 style={{
-                  position: 'absolute',
-                  zIndex: 2,
-                  top: -2,
-                  left: -2
+                  position: 'relative',
                 }}
-              />
-              {user.avatar && user.avatar.file_path
-                ? <Thumbnail source={{ uri: `${SERVER.URL}${user.avatar.file_path}` }} style={{ height: 50, width: 50 }} />
-                : <EvilIcon name="user" size={65} />
-              }
-            </TouchableOpacity>
-          )}
-        />
-      )) || <></>}
-      {fetching && (
-        <View style={styles.spinnerContainer}><Spinner /></View>
-      ) || (
-        <FlatList
-          data={users}
-          keyExtractor={(item) => item.id.toString()}
-          style={{
-            marginTop: 10
-          }}
-          ListEmptyComponent={() => (
-            <Text
-              style={{ textAlign: 'center', color: 'gray' }}
-            >
-              Пользователи не найдены
-            </Text>
-          )}
-          renderItem={({ item: user }) => (
-            <ListItem key={user.id} onPressOut={() => {}} style={{ paddingLeft: 0, marginLeft: 0 }} avatar>
-              <Left>
+                activeOpacity={1}
+                onPress={() => setCompetitors(competitors.filter(c => c.id !== user.id))}
+              >
+                <Ionicons
+                  name="ios-close-circle"
+                  size={20}
+                  style={{
+                    position: 'absolute',
+                    zIndex: 2,
+                    top: -2,
+                    left: -2
+                  }}
+                />
                 {user.avatar && user.avatar.file_path
-                  ? <Thumbnail source={{ uri: `${SERVER.URL}${user.avatar.file_path}` }} style={{ height: 40, width: 40 }} />
-                  : <EvilIcon name="user" size={40} />
+                  ? <Thumbnail source={{ uri: `${SERVER.URL}${user.avatar.file_path}` }} style={{ height: 50, width: 50 }} />
+                  : <EvilIcon name="user" size={65} />
                 }
-              </Left>
-              <Body style={styles.listBody}>
-                <Text>{user.name} {user.lastname || ''}</Text>
-                <Text style={styles.listSubtitle}>{user.login}</Text>
-              </Body>
-              <Right style={{ alignItems: 'center', justifyContent: 'center' }}>
-                {competitors.find(c => c.id === user.id)
-                  ? (
-                    <TouchableOpacity
-                      activeOpacity={1}
-                      onPress={() => setCompetitors(competitors.filter(c => c.id !== user.id))}
-                    >
-                      <Ionicons
-                        name="ios-checkmark-circle"
-                        color="blue"
-                        size={30}
+              </TouchableOpacity>
+            )}
+          />
+        )) || <></>}
+      <View style={{ flexGrow: 1, flex: 1 }}>
+        {fetching && (
+          <View style={styles.spinnerContainer}><Spinner /></View>
+        ) || (
+          <FlatList
+            data={users}
+            keyExtractor={(item) => item.id.toString()}
+            style={{
+              marginTop: 10
+            }}
+            ListEmptyComponent={() => (
+              <Text
+                style={{ textAlign: 'center', color: 'gray' }}
+              >
+                Пользователи не найдены
+              </Text>
+            )}
+            renderItem={({ item: user }) => (
+              <ListItem key={user.id} onPressOut={() => {}} style={{ paddingLeft: 0, marginLeft: 0 }} avatar>
+                <Left>
+                  {user.avatar && user.avatar.file_path
+                    ? <Thumbnail source={{ uri: `${SERVER.URL}${user.avatar.file_path}` }} style={{ height: 40, width: 40 }} />
+                    : <EvilIcon name="user" size={40} />
+                  }
+                </Left>
+                <Body style={styles.listBody}>
+                  <Text>{user.name} {user.lastname || ''}</Text>
+                  <Text style={styles.listSubtitle}>{user.login}</Text>
+                </Body>
+                <Right style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  {competitors.find(c => c.id === user.id)
+                    ? (
+                      <TouchableOpacity
+                        activeOpacity={1}
+                        onPress={() => setCompetitors(competitors.filter(c => c.id !== user.id))}
+                      >
+                        <Ionicons
+                          name="ios-checkmark-circle"
+                          color="blue"
+                          size={30}
+                        />
+                      </TouchableOpacity>
+                    )
+                    : (
+                      <TouchableOpacity
+                        activeOpacity={1}
+                        onPress={() => setCompetitors([...competitors, user])}
+                        style={{
+                          height: 25,
+                          width: 25,
+                          borderWidth: 2,
+                          borderColor: 'blue',
+                          borderRadius: 30/2
+                        }}
                       />
-                    </TouchableOpacity>
-                  )
-                  : (
-                    <TouchableOpacity
-                      activeOpacity={1}
-                      onPress={() => setCompetitors([...competitors, user])}
-                      style={{
-                        height: 25,
-                        width: 25,
-                        borderWidth: 2,
-                        borderColor: 'blue',
-                        borderRadius: 30/2
-                      }}
-                    />
-                )}
-              </Right>
-            </ListItem>
-          )}
-        />
-      )}
-      {/* { fetching &&  } */}
+                  )}
+                </Right>
+              </ListItem>
+            )}
+          />
+        )}
+      </View>
+      {(competitors.length && (
+        <TouchableOpacity onPress={() => navigation.navigate('create_group', { competitors })} style={styles.footerBtn}>
+          <Text style={styles.footerText}>Далее</Text>
+        </TouchableOpacity>
+      )) || <></>}
     </View>
   )
 };
@@ -221,6 +215,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)'
   },
+  footer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopColor: 'lightgray',
+    paddingHorizontal: 30
+  },
+  footerBtn: {
+    backgroundColor: 'blue',
+    width: '100%',
+    paddingVertical: 10,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  footerText: {
+    color: '#fff',
+    fontSize: 16
+  }
 });

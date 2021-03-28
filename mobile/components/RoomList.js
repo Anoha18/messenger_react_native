@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import { List, ListItem, Thumbnail, Body, Left, Right, Badge } from 'native-base';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { SERVER } from '../config';
 
 export default ({
@@ -26,19 +27,33 @@ export default ({
     return <></>;
   }
 
+  const renderAvatar = (room) => {
+    if (room.type_brief === 'PRIVATE') {
+      return room.recipient.avatar && room.recipient.avatar.file_path
+      ? <Thumbnail source={{ uri: `${SERVER.URL}${room.recipient.avatar.file_path}` }} style={{ width: 40, height: 40 }} />
+      : <EvilIcon name="user" size={40} />
+    }
+
+    return <FontAwesome name="users" size={40} />
+  }
+
+  const renderRoomName = (room) => {
+    if (room.type_brief === 'PRIVATE') {
+      return `${(room.recipient && room.recipient.name) || ''} ${(room.recipient && room.recipient.lastname) || ''}`;
+    }
+
+    return room.name || '';
+  }
+
   return (
     <List>
       {roomList.map(room => (
         <ListItem key={room.id} onPressOut={() => onSelectRoom(room.id)} avatar>
           <Left>
-            {
-              room.recipient.avatar && room.recipient.avatar.file_path
-                ? <Thumbnail source={{ uri: `${SERVER.URL}${room.recipient.avatar.file_path}` }} style={{ width: 40, height: 40 }} />
-                : <EvilIcon name="user" size={40} />
-            }
+            {renderAvatar(room)}
           </Left>
           <Body style={styles.body}>
-            <Text style={styles.itemTitle}>{(room.recipient && room.recipient.name) || ''} {(room.recipient && room.recipient.lastname) || ''}</Text>
+            <Text style={styles.itemTitle}>{renderRoomName(room)}</Text>
             <Text style={styles.itemDescription}>
               {(room.last_message && room.last_message.file && ((room.last_message.text && 'Фотография, ') || 'Фотография')) || ''}
               {(room.last_message && room.last_message.text) || ''}</Text>

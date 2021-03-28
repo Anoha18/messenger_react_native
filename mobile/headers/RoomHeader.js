@@ -20,7 +20,6 @@ export default (props) => {
       androidStatusBarColor="#fff"
       style={styles.header}
     >
-      <StatusBar barStyle="dark-content" />
       <Left style={{ flex: 1 }}>
         <Button
           onPress={onPressBack}
@@ -30,23 +29,30 @@ export default (props) => {
           <Icon style={{ color: 'black' }} name="arrow-back" />
         </Button>
       </Left>
-      <Body style={{ flex: 0 }}>
-        <Title style={styles.headerTitle}>
+      <Body style={{ flex: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          lineBreakMode="tail"
+          style={styles.headerTitle}
+        >
           {params.title || ''}
-        </Title>
+        </Text>
       </Body>
       <Right style={{ flex: 1 }}>
-          { params.avatar
-              ? <Thumbnail
-                  source={{ uri: params.avatar }}
-                  size={40}
-                  style={{
-                    width: 40,
-                    height: 40
-                  }}
-                />
-              : <EvilIcon name="user" size={40} />
-          }
+        {params.renderAvatar
+          ? params.renderAvatar()
+          : params.avatar
+            ? <Thumbnail
+                source={{ uri: params.avatar }}
+                size={40}
+                style={{
+                  width: 40,
+                  height: 40
+                }}
+              />
+            : <EvilIcon name="user" size={40} />
+        }
       </Right>
     </Header>
   )
@@ -59,6 +65,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   headerTitle: {
-    color: 'black'
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 20,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });

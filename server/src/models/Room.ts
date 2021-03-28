@@ -119,8 +119,36 @@ export default class Room {
               and u.deleted = false
               limit 1
             )
+            limit 1
           ) t
-        ) recipient
+        ) recipient,
+        (
+          select json_agg(t) from (
+            select
+              u.id,
+              u.name,
+              u.lastname,
+              u.login,
+              (
+                select row_to_json(t) from (
+                  select
+                    ua.id,
+                    ua.file_id,
+                    f.file_path
+                  from user_avatar ua
+                  inner join files f on f.id = ua.file_id
+                  where ua.user_id = u.id
+                  and f.deleted = false
+                ) t
+              ) avatar
+            from users u
+            where exists (
+              select 1 from room_users ru
+              where ru.user_id = u.id
+              and ru.room_id = r.id
+            )
+          ) t
+        ) users
       from rooms r
       inner join room_types rt on rt.id = r.type_id
       where exists (
@@ -168,6 +196,7 @@ export default class Room {
         r.id,
         r.name,
         rt.name as type,
+        rt.brief type_brief,
         to_char(r.created_at, 'DD.MM.YYYY') created_date,
         to_char(r.created_at, 'HH24:MI') created_time,
         to_char(r.updated_at, 'HH24:MI') updated_time,

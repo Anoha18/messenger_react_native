@@ -74,15 +74,42 @@ export default class ChatRoomController extends BaseController {
     res.json({ result: room });
   }
 
-  private async createGroupChat(req: Request, res: Response): Promise<void> {
+  private async createGroupChat(req: Request, res: Response) {
     const briefGroupRoom = 'CONVERSATION';
     const body: NewGroupRoomBody = req.body as NewGroupRoomBody;
+    const user: UserInterface = req.user as UserInterface;
     try {
       const roomType = await RoomType.getByBrief(briefGroupRoom);
       if (!roomType) {
         console.error('Error. Create group room. Not found room type by ', briefGroupRoom);
-        
+        return res.json({ error: 'Error. Not found room type' });
       }
+
+      const { groupName, competitorsId } = body;
+      const { roomId, error } = await Room.createRoom({
+        name: groupName,
+        creator_id: user.id,
+        type_id: roomType.id,
+      });
+      if (error) {
+        console.error('Error. Create group room ', error);
+        return res.json({ error });
+      }
+      if (!roomId) {
+        const errorMessage = 'Error. Create group room. Room id not found';
+        console.error(errorMessage);
+        return res.json({ error: errorMessage });
+      }
+
+      await RoomUser.saveUsersByRoom([...competitorsId, user.id], roomId);
+      const { room, error: getRoomByIdError } = await Room.getRoomById(roomId);
+      if (getRoomByIdError) {
+        const errorMessage = 'Error. Create group room. Get room by id error found. Error = ' + getRoomByIdError;
+        console.error(errorMessage);
+        return res.json({ error: errorMessage });
+      }
+
+      res.json({ result: room });
     } catch (error) {
       console.error('Error. Create group room ', error.message);
       res.json({ error: error.message });

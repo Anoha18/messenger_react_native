@@ -83,12 +83,16 @@ export const createGroupChatRoom = (params) => async (dispatch) => {
     const { data } = await api.post('/chat/group_new', params);
     const { result, error } = data;
 
+    console.log('createGroupChatRoom. Data = ', data);
+
     if (error) return { error };
 
     dispatch({
       type: SET_CHAT_ROOM,
       chatRoom: result || null,
     })
+
+    return { room: result }
   } catch (error) {
     console.error('Error. Create group chat ', error);
     return { error: error.message };
