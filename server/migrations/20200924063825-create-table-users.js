@@ -1,7 +1,5 @@
 'use strict';
 
-const { text } = require("body-parser");
-
 var dbm;
 var type;
 var seed;
