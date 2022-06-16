@@ -11,9 +11,9 @@ module.exports = {
   },
   DB: {
     NAME: 'messenger',
-    USER: 'anoha',
-    PASSWORD: '0000',
-    HOST: 'localhost',
+    USER: 'postgres',
+    PASSWORD: 'Y4nMWpdOU1F1NkpcwCQnQRWxHSxOCP',
+    HOST: 'postgres',
     PORT: 5432
   },
   SOCKET: {

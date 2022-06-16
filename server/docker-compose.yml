@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  server:
+    image: messenger-server
+    build: .
+    container_name: messenger-server
+    restart: unless-stopped
+    ports:
+      - 3085:3000
+    networks:
+      - net
+      - db
+    volumes:
+      - /home/messenger/uploads:/app/uploads
+
+networks:
+  db:
+    external: true
+    name: db_postgres
+  net:
+    driver: bridge

@@ -10,8 +10,10 @@ WORKDIR /app
 COPY . .
 COPY --from=install_dependecies /app/node_modules ./node_modules
 COPY --from=install_dependecies /app/package.json ./package.json
+COPY config.prod.js ./src/config.js
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=4096
+RUN npm run build
 
 FROM node:16-alpine AS start
 RUN apk add --no-cache libc6-compat
