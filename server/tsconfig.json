@@ -70,6 +70,7 @@
     "config.example.js",
     "migrations.js",
     "migrations",
-    "dist"
+    "dist",
+    "config.prod.js"
   ]
 }
