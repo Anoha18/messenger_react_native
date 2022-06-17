@@ -73,8 +73,8 @@ export default class SocketServer {
       const tokenData = jwt.verify(token, JWT.ACCESS_JWT_SECRET);
       return { tokenData }
     } catch (error) {
-      console.error(error);
-      return { error: error.message }
+      console.error('decodeToken: ', error);
+      return { error: 'error' }
     }
   }
 

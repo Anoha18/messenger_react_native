@@ -26,8 +26,8 @@ export const testConnection = async():Promise<ReturnTestConnection> => {
     console.log('Connection to data base success');
     return { success: 1 }
   } catch (error) {
-    console.error(error);
-    return { success: 0, error: error.message }
+    console.error('Error connection DB: ', error);
+    return { success: 0, error: 'true' }
   }
 }
 
@@ -46,8 +46,8 @@ export const multiQuery = async(query:string, values?: Array<any>):Promise<Retur
     const { rows } = await pool.query(query, values);
     return { rows };
   } catch (error) {
-    console.error(error);
-    return { error: error.message }
+    console.error('multiQuery error: ', error);
+    return { error: 'error' }
   }
 }
 
@@ -65,7 +65,7 @@ export const singleQuery = async(query:string, values?: Array<any>):Promise<Retu
     const { rows } = await pool.query(query, values);
     return { row: (rows && rows[0]) || null };
   } catch (error) {
-    console.error(error);
-    return { error: error.message }
+    console.error('singleQuery error: ', error);
+    return { error: 'error' }
   }
 }

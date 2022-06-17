@@ -25,7 +25,13 @@ const decodedRefreshToken = (refreshToken: string) => {
     const tokenData = jwt.verify(refreshToken, JWT.REFRESH_JWT_SECRET);
     return { tokenData };
   } catch (error) {
-    return { error: error.message };
+    if (error instanceof Error) {
+      console.error('Token data', error.message);
+      return { error: error.message };
+    } else {
+      console.error('Token data', error);
+      return { error }
+    }
   }
 }
 

@@ -67,8 +67,13 @@ export default class UserController extends BaseController {
   
       res.json({ result: updatedUser });
     } catch (error) {
-      console.error(error);
-      res.json({ error: error.message });
+      if (error instanceof Error) {
+        console.error('Update user ', error.message);
+        res.json({ error: error.message });
+      } else {
+        console.error(error)
+        res.json({ error });
+      }
     }
   }
 }

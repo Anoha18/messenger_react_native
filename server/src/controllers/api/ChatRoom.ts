@@ -111,8 +111,13 @@ export default class ChatRoomController extends BaseController {
 
       res.json({ result: room });
     } catch (error) {
-      console.error('Error. Create group room ', error.message);
-      res.json({ error: error.message });
+      if (error instanceof Error) {
+        console.error('Error. Create group room ', error.message);
+        res.json({ error: error.message });
+      } else {
+        console.error(error)
+        res.json({ error });
+      }
     }
   }
 }
