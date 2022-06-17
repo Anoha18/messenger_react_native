@@ -6,6 +6,7 @@ import requestIp from 'request-ip';
 import { jwt, local } from './auth_strategies';
 import controllers from './controllers';
 import { Request, Response, NextFunction } from 'express';
+import { UserInterface } from './interfaces/user';
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -13,7 +14,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((user, done) => {
   if (user) {
-    done(null, user);
+    done(null, user as UserInterface);
   }
 });
 
