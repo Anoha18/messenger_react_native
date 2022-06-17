@@ -13,7 +13,7 @@ export default class {
   }
 
   public listen():void {
-    this.server.listen(this.port, this.host, 1, () =>{
+    this.server.listen(this.port, () =>{
       console.log(`Server is running on http://${this.host}:${this.port}`);
     })
   }
