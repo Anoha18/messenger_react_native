@@ -41,14 +41,15 @@ export default class FileController extends BaseController {
   private async uploadFile(req: Request, res: Response) {
     const { file, user } = req;
     if (!user) return res.json({ error: 'User not found' });
+    if (!file) return res.json({ error: 'File not found' });
 
 
     const { file: savedFile, error } = await File.saveFile({
-      file_name: file.filename,
+      file_name: file?.filename,
       file_path: `/uploads/${file.filename}`,
-      mime_type: file.mimetype,
-      creator_id: (user as UserInterface).id,
-      type: (file.mimetype.split('/'))[0]
+      mime_type: file?.mimetype,
+      creator_id: (user as UserInterface)?.id,
+      type: (file?.mimetype.split('/'))[0]
     });
 
     if (error) return res.json({ error });

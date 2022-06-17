@@ -12,7 +12,9 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((user, done) => {
-  done(null, user);
+  if (user) {
+    done(null, user);
+  }
 });
 
 passport.use(jwt);
