@@ -20,7 +20,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY --from=install_dependecies /app/node_modules ./node_modules
 COPY --from=install_dependecies /app/package.json ./package.json
-COPY --from=build /app/dist ./dist
+COPY --from=build /app .
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=4096
 CMD ["npm", "start"]
